@@ -5,17 +5,11 @@ Backend services that communicate with backend server.
 
 ### Installation
 1. Tools and software
-- SQL Management Tools
-    > Download [Dbeaver](https://dbeaver.io/download/)  
-    > Setup your password       
-    > Create database in postgres. [pcs_be]  
-    
 - Mosquitto Mqtt
     > Download [Mosquitto](https://mosquitto.org/download/)
     > For windowOS, ensure the broker is running under services.msc
     > For mock raspberry device, run at terminal 
 
-        
         python -m app.mqtt.mqtt_mock_rasp {client_id:int}
         python -m app.mqtt.mqtt_mock_rasp 1234
 
@@ -34,14 +28,13 @@ Backend services that communicate with backend server.
     > tc\Scripts\activate   
     > pip install -r requirements.txt   
 
-    Linux OS
+    Linux || macOS
     > virtualenv tc     
     > source tc/bin/activate    
     > pip install -r requirements.txt 
 
 3. Create .env file
 - create .env at root directory , refer .env_sample
-
 
 4. Run unittest 
 -  python -m unittest discover -s tests -p "test_*.py" -v
