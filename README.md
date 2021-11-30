@@ -3,6 +3,19 @@ Backend services that communicate with backend server.
 
 [Doc cloud link password:PSS](https://whimsical.com/pcs-UUWPYTmjdTin3tQacjEDCj)
 
+### File structure
+.
+├── github                   # Contain github ci/cd workflows 
+    |── workflows            # Contain YAML file
+├── app                      # Main app folder
+├── tests                    # unit test , integration test and e2e test
+├── docs                     # Documentation
+├── main.py                  # Driver code
+├── README.md
+├── requirements.txt
+├── .env_sample
+└── .gitignore
+
 ### Installation
 1. Tools and software
 - Mosquitto Mqtt
