@@ -2,19 +2,25 @@
 Backend services that targeted install on raspberry-pi. Collect data from i2c IO and publish to mqtt broker with specify topic. 
 
 
-### Flow
+### Thread
 1. Main thread : i2c connection and handler.
 2. 2nd thread : mqtt client
 3. 3rd thraed : mqtt message consumer
 
-### Dependency between cross threaded flow
-1. Mqtt establish connection and obtain setting from server.
-2. i2c connection iterate and loop 3 or 4 or 5 rasp IO via i2c bus protocol to obtain message and dump into queue. 
-3. i2c will skip iterate and loop IO until Mqtt successful obtain tower type or setting from server.
+### Functional Requirement
+1. Rasp establish MQTT connection and auto perform reconnection when broker down.
+2. Rasp request setting and auto reattempt when no response after exceed timeout.
+3. Rasp update configuration to singleton variable upon receive response from server.
+4. Rasp use modbus to establish i2c connection with raspberry IO.
+5. Rasp implement busy loop pattern and read i2c bus protocol to obtain tower light signal.
+6. Rasp read IO based on tower type and processes the data.
+7. Rasp update tower light event to server upon detected changes.
+8. Rasp update tower light event to server in fix interval.
+
  
-### Rules
-1. Client rasp will only subscribe to the topic that belong to it mac addres
-2. Server mqtt will subscribe all topic with wildcard "+" subscribe any topic matches a topic with single-level wildcard if it contains an arbitrary. Refer [MQTT TOPIC BEST PRACTICES](https://www.hivemq.com/blog/mqtt-essentials-part-5-mqtt-topics-best-practices/)
+### Rules of Thumb
+1. Client rasp will only subscribe to the topic that belong to its own mac address
+2. Server MQTT will subscribe all topic with wildcard "+" subscribe any topic matches a topic with single-level wildcard if it contains an arbitrary. Refer [MQTT TOPIC BEST PRACTICES](https://www.hivemq.com/blog/mqtt-essentials-part-5-mqtt-topics-best-practices/)
 
 ### File structure
     .
