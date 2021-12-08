@@ -22,13 +22,13 @@ class TowerType(Enum):
 
 class LightEvent(Enum):
     ''' Use by repo pcs-rasp '''
-    # There are six major light event for each color, every color can have 6 combination of lighting type either in flashing or continuous.
+    # There are six major light event for each color, every color can have 6 combination of lighting type either in flashing or continuous. There are total 7776 combinations for six event lights with five colors and it can denote as : 6*6*6*6*6*6
     SolidOn = 1             # 点灯      |||||||||||||||
     SolidOff = 2            # 消灯      xxxxxxxxxxxxxxx
     FastFlashing = 3        # 高速点灭  |x|x|x|x|x|x|x|
     SlowFlashing = 4        # 低速点灭  ||xx||xx||xx|||
     DUNKNOW = 5             # 瞬时点灯  x|xxxxxxxxxxxxx
-    DUNKNOW2 = 6            # 瞬时消等  |x|||||||||||||  
+    DUNKNOW2 = 6            # 瞬时消灯  |x|||||||||||||  
 
 
 class ColorType(Enum):
