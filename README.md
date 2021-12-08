@@ -16,6 +16,8 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
 6. Rasp read IO based on tower type and processes the data.
 7. Rasp update tower light event to server upon detected changes.
 8. Rasp update tower light event to server in fix interval.
+9. Rasp apply time out setting (in Seconds) to limit the time for running. (When to resume ?)
+    > Answer :
 
  
 ### Rules of Thumb
