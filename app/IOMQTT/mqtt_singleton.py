@@ -11,7 +11,6 @@ class MQTTConfiguration:
             self.RECONNECT_INTERVAL = 15
             self.TOWER_TYPE = None
             self.FREQUENCY = None
-            self.TIMEOUT_INTERVAL = None
 
             # Mqtt Constant
             self.BOL_IS_RECEIVED = True

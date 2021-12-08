@@ -27,8 +27,9 @@ class LightEvent(Enum):
     SolidOff = 2            # 消灯      xxxxxxxxxxxxxxx
     FastFlashing = 3        # 高速点灭  |x|x|x|x|x|x|x|
     SlowFlashing = 4        # 低速点灭  ||xx||xx||xx|||
-    DUNKNOW = 5             # 瞬时点灯  x|xxxxxxxxxxxxx
-    DUNKNOW2 = 6            # 瞬时消灯  |x|||||||||||||  
+    FlaskOnOnce = 5         # 瞬时点灯  x|xxxxxxxxxxxxx
+    FlaskOffOnce = 6        # 瞬时消灯  |x|||||||||||||  
+    Unknown = 0
 
 
 class ColorType(Enum):
@@ -40,4 +41,8 @@ class ColorType(Enum):
     Blue = 4
     White = 5
 
-
+class EventDesc(Enum):
+    Running = 1         #Green solid on and other SolidOff
+    Warning = 2         #Amber solid on and other Solidoff   || Amber on , green on || Ambet on , green in [2,3,4,5]
+    Alert = 3           #Red solid on and other Solidoff  
+    Down = 5            # All off
