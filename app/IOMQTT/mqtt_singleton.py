@@ -10,7 +10,7 @@ class MQTTConfiguration:
             self.CLIENT_ID = None
             self.RECONNECT_INTERVAL = 15
             self.TOWER_TYPE = None
-            self.FREQUENCY = None
+            self.FREQUENCY = 0
 
             # Mqtt Constant
             self.BOL_IS_RECEIVED = True
@@ -18,7 +18,7 @@ class MQTTConfiguration:
      
             # Request Setting Constant
             self.BOL_SETTING_SUCCESS = False
-            self.REQUEST_RESEND_INTERVAL = 15
+            self.REQUEST_RESEND_INTERVAL = 3
 
       
     instance = None
