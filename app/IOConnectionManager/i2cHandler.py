@@ -29,12 +29,14 @@ def i2cConnection():
 
 def i2cHandler():
     while True :
+        try :
+            message = _i2cMessageIncoming()
+            
+            for _message in message :
+                pass
+                #TODO transfrom and normalize i2c data to event , broadcast to server
 
-        message = _i2cMessageIncoming()
-        
-        for _message in message :
-            pass
-            #TODO transfrom and normalize i2c data to event , broadcast to server
-
-        time.sleep(30)
-        print(f"{datetime.datetime.now()} Thread i2cHandler")
+            time.sleep(30)
+            print(f"{datetime.datetime.now()} Thread i2cHandler")
+        except Exception as e :
+            print(colored('MQTT i2cHandler()','red'),f"{e.args}")
