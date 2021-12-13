@@ -11,6 +11,9 @@ class I2CConfiguration:
 
             # Queue to store i2c IO input 
             self.MESSAGE_QUEUE = Queue()
+
+            # Mock IO
+            self.BOL_MOCK_IO = True
       
     instance = None
     def __init__(self,arg=None) -> None:

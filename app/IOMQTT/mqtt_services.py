@@ -35,7 +35,7 @@ class MqttServices:
 
         try :
             if payload is None :
-                payload=  {"client_id" : client_id , 'id' : None , "dt" : datetime.now()}
+                payload=  {"mac_client_id" : client_id , 'client_id' : None , "dt" : datetime.now()}
                 payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
 
             mqtt_client.publish_topic(payload,client_id,ClientPublishTopic.RequestConfig.value)

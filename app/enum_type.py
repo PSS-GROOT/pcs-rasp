@@ -20,6 +20,14 @@ class TowerType(Enum):
     Four = 4
     Five = 5
 
+class TowerTypeColor(Enum):
+    # Each tower type map to specific color , or can iterate with enum ColorType according to TowerType's quantity
+    One = ["Red"]
+    Two = ["Red","Amber"]
+    Three = ["Red","Amber","Green"]
+    Four = ["Red","Amber","Green","Blue"]
+    Five = ["Red","Amber","Green","Blue","White"]
+
 class LightEvent(Enum):
     ''' Use by repo pcs-rasp '''
     # There are six major light event for each color, every color can have 6 combination of lighting type either in flashing or continuous. There are total 7776 combinations for six event lights with five colors and it can denote as : 6*6*6*6*6*6
