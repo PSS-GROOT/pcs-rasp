@@ -12,16 +12,17 @@ from app.IOMQTT.mqtt_singleton import MQTTConfiguration, SettingRequest
 from app.enum_type import ClientPublishTopic, PublishTopic
 from app.Utilities.helper_function import DateTimeEncoder
 from app.IOMQTT import mqtt_client
+from app.IOMQTT.mqtt_interface import MqttClientInterface
 
 
 MQTTCON = MQTTConfiguration().instance
 
-class MqttServices:
+class MqttServices(MqttClientInterface):
     def __init__(self,desc:str) -> None:
         self.desc = desc
         self.settingRequest : SettingRequest = SettingRequest(MQTTCON.REQUEST_RESEND_INTERVAL)
 
-    def request_configuration(self,client_id:int,payload:str=None):
+    def request_configuration(self,mac_client_id:int,payload:str=None):
         ''' 
         #Returns None
 
@@ -35,48 +36,123 @@ class MqttServices:
 
         try :
             if payload is None :
-                payload=  {"mac_client_id" : client_id , 'client_id' : None , "dt" : datetime.now()}
+                payload=  {"mac_client_id" : mac_client_id , 'client_id' : None , "dt" : datetime.now()}
                 payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
 
-            mqtt_client.publish_topic(payload,client_id,ClientPublishTopic.RequestConfig.value)
+            mqtt_client.publish_topic(payload,mac_client_id,ClientPublishTopic.RequestConfig.value)
 
             self.settingRequest.lastAttempt = datetime.now()
         except Exception as e :
-            print(colored('MQTT send_configuration()','red'),f"{e.args}")
+            print(colored('MQTT request_configuration()','red'),f"{e.args}")
     
-    def reply_event_changed(self,client_id:int,payload:str=None):
-        try :
-            # payload=  {"MqttServices" : 'send_configuration'}
-            mqtt_client.publish_topic(payload,client_id,ClientPublishTopic.ReplyEvent)
-        except Exception as e :
-            print(colored('MQTT send_configuration()','red'),f"{e.args}")
-
-    def reply_services(self,client_id:int,payload:str=None):
-        try :
-            # payload=  {"MqttServices" : 'send_configuration'}
-            mqtt_client.publish_topic(payload,client_id,ClientPublishTopic.ReplyService)
-        except Exception as e :
-            print(colored('MQTT send_configuration()','red'),f"{e.args}")
-
-    def resend_Message(self):
-        # Resend Request Configuration
-        try :
-            if self.settingRequest.bolRequest is False :
-                if self.settingRequest.attemptRequest():
-                    MqttServices('rasp').request_configuration(MQTTCON.MAC_CLIENT_ID)
-                    self.settingRequest.lastAttempt = datetime.now()
-        except Exception as e :
-            print(colored('MQTT send_configuration()','red'),f"{e.args}")
-
-    def update_configration(self,payload:dict):
+    def reply_event_changed(self,event_status:str=None):
         ''' 
         #Returns None
 
         #Parameters:
-            payload(dict) : The content to publish in python dict.
+            event_status(list) : The light event for each address. 
+                                 e.g = [1,1,0] The element order is follow according to the address of raspberryPI IO.
         
         #Return:
-            None : Update MQTT configuration.
+            None : Broadcast and emit message to broker
+        '''
+
+        try :
+            payload = dict(
+                light_event = event_status ,
+                mac_client_id = MQTTCON.MAC_CLIENT_ID ,
+                client_id = MQTTCON.CLIENT_ID ,
+                tower_type = MQTTCON.TOWER_TYPE
+            )
+            payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
+            mqtt_client.publish_topic(payload,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplyEvent.value)
+        except Exception as e :
+            print(colored('MQTT reply_event_changed()','red'),f"{e.args}")
+
+    def reply_services(self,server_status:str):
+        ''' 
+        #Returns None
+
+        #Parameters:
+            event_status(<ServiceStatus(Enum).value : str) : The raspberry pi to i2c IO connection status in string.
+        
+        #Return:
+            None : Broadcast and emit message to broker
+        '''
+        try :
+         
+            payload = dict(
+                status = server_status ,
+                mac_client_id = MQTTCON.MAC_CLIENT_ID ,
+                client_id = MQTTCON.CLIENT_ID ,
+            )
+            payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)      
+            mqtt_client.publish_topic(payload,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplyService.value)
+        except Exception as e :
+            print(colored('MQTT reply_services()','red'),f"{e.args}")
+
+    def reply_error(self,message:str=None):
+        try :
+            mac_client_id = MQTTCON.MAC_CLIENT_ID
+
+            payload = dict(
+                message = message ,
+                mac_client_id = mac_client_id ,
+                client_id = MQTTCON.CLIENT_ID ,
+            )
+            payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
+            mqtt_client.publish_topic(payload,mac_client_id,ClientPublishTopic.ReplyErrorLog.value)
+        except Exception as e :
+            print(colored('MQTT reply_error()','red'),f"{e.args}")
+    
+    def reply_ack(self,ack_type=str):
+        try :
+            mac_client_id = MQTTCON.MAC_CLIENT_ID
+
+            payload = dict(
+                mac_client_id = mac_client_id ,
+                client_id = MQTTCON.CLIENT_ID ,
+                ack_type = ack_type
+            )
+
+            payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
+            mqtt_client.publish_topic(payload,mac_client_id,ClientPublishTopic.ReplyAck.value)
+        except Exception as e :
+            print(colored('MQTT reply_ack()','red'),f"{e.args}")
+    
+    def reply_pong(self):
+        try :
+            mac_client_id = MQTTCON.MAC_CLIENT_ID
+
+            payload = dict(
+                mac_client_id = mac_client_id ,
+                client_id = MQTTCON.CLIENT_ID ,
+            )
+            payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
+            mqtt_client.publish_topic(payload,mac_client_id,ClientPublishTopic.ReplyPong.value)
+        except Exception as e :
+            print(colored('MQTT reply_pong()','red'),f"{e.args}")
+
+
+    def resend_message(self):
+        # Resend Request Configuration
+        try :
+            if self.settingRequest.bolRequest is False :
+                if self.settingRequest.attemptRequest():
+                    self.request_configuration(MQTTCON.MAC_CLIENT_ID)
+                    self.settingRequest.lastAttempt = datetime.now()
+        except Exception as e :
+            print(colored('MQTT send_configuration()','red'),f"{e.args}")
+
+    def update_configuration(self,payload:dict):
+        ''' 
+        #Returns None
+
+        #Parameters:
+            payload(dict) : The key pair value to update MQTT configuration.
+        
+        #Return:
+            None 
         '''
 
         try :
@@ -126,41 +202,36 @@ def mqtt_consumer():
         while True :
             try :
                 
-                mServices.resend_Message()
+                mServices.resend_message()
                 
                 if MQTTCON.BOL_IS_RECEIVED :
                     messsage_queue = _receive_incoming_message()
 
                     if len(messsage_queue) > 0 :
                         for message in messsage_queue :
-
-                            # print(colored('MQTT receive_incoming_message()','blue'),message)
-
+                      
                             # split only the first occurence to obtain client id.
                             client_id = message['topic'].split('/',1)[0]
 
                             # split only the first occurence to eliminate client id , get the next element.
                             client_topic_without_forward_slash = message['topic'].split('/',1)[1]
-                            client_payload = json.loads(message['msg'])
-                            # decode_date = datetime.fromisoformat(client_payload['ts'])
-                            # print(client_payload,"Received")
-
+                            client_payload = json.loads(message['msg'])                  
                             client_topic = "/" + client_topic_without_forward_slash
 
                             if client_topic == PublishTopic.Config.value :
                                 # Receive setting from server , require to update Configuration
-                                mServices.update_configration(client_payload)
+                                mServices.update_configuration(client_payload)
                                 pass
                             elif client_topic == PublishTopic.Ping.value :
                                 # Receive ping from server , require reply pong
+                                mServices.reply_pong()
                                 pass
                             elif client_topic == PublishTopic.ConfigUpdate.value :
                                 # Receive config update from server , require to update Configuration
+                                mServices.update_configuration(client_payload)
+                                mServices.reply_ack(client_topic)
                                 pass
-
-                            # payload = json.dumps({"setting":{ "frequency" : 10}},indent=4, cls=DateTimeEncoder)
-                            # mServices.send_configuration(client_id,payload)
-
+                                                   
                     # TURN OFF THE FLAG
                     MQTTCON.BOL_IS_RECEIVED = False
                 

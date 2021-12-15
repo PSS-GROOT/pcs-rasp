@@ -58,7 +58,9 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
         e.g mosquitto_sub -h 127.0.0.1 -t 0x106530ea239e/server/config
 
     > Publish topic via terminal / cmd
-        e.g mosquitto_pub -h 127.0.0.1 -t 0x106530ea239e/server/config -m "{\"test message\" : 1}" -d
+        e.g mosquitto_pub -h 127.0.0.1 -t 0x106530ea239e/server/config -m "{\"tower_type\" : 1}" -d
+        e.g mosquitto_pub -h 127.0.0.1 -t 0x106530ea239e/server/ping -m "{\"status\" : 1}" -d
+        e.g mosquitto_pub -h 127.0.0.1 -t 0x106530ea239e/server/config/update -m "{\"frequency\" : 1}" -d
     
    
 2. Activate virtual environment and install dependencies

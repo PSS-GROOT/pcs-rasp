@@ -14,6 +14,7 @@ from app.enum_type import ClientPublishTopic, PublishTopic
 
 
 mqtt_incoming_msg = Queue()
+mqtt_outgoing_msg = Queue()
 
 client : mqtt.Client = None
 connected = False

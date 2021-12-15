@@ -26,17 +26,24 @@ def _mock(tower_type):
         if (currentCount > intFrequency) and (intFrequency != 0):
             # Add to queue only if not empty list
             if temp_data != [] :
-                I2CCON.MESSAGE_QUEUE.put(temp_data)
+                data = dict(data = temp_data ,address = ('port1','port2','port3') )
+                I2CCON.MESSAGE_QUEUE.put(data)
+                print("put data in queue", data)
                 temp_data = []
 
             # Reset counter 
             currentCount = 0
             temp_data = []
             print("Reset counter and empty data")
+        elif intFrequency == 0 :
+            currentCount = 0
+            temp_data = []
+            print("Reset counter and empty data due to configuration frequency is still 0.")
         else :
             # mock data for each frequency interval
             output = helperFunction.getTowerColorGroup(tower_type=tower_type)
-
+            # print(output)
+        
 
             data_list =[2] * len(output)
             # e.g data_list = [2,2,2]
@@ -56,6 +63,7 @@ def _mock(tower_type):
 
             data_list = tuple(data_list)
             temp_data.append(data_list)
+            # print("append data",data_list)
 
 
         currentCount += 1

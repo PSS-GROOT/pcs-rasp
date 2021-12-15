@@ -10,6 +10,8 @@ class ClientPublishTopic(Enum):
     ReplyService = "/client/service"
     ReplyEvent = "/client/event"
     ReplyErrorLog = "/client/error"
+    ReplyAck = "/client/ack"
+    ReplyPong = "/client/pong"
 
 class TowerType(Enum):
     ''' Use by repo pcs-rasp '''
@@ -54,3 +56,8 @@ class EventDesc(Enum):
     Warning = 2         #Amber solid on and other Solidoff   || Amber on , green on || Ambet on , green in [2,3,4,5]
     Alert = 3           #Red solid on and other Solidoff  
     Down = 5            # All off
+
+
+class ServiceStatus(Enum):
+    Available = 1
+    Inactive = 0

@@ -9,11 +9,15 @@ class I2CConfiguration:
             self.RECONNECT_INTERVAL = 15
             self.IS_CONNECTED = False
 
-            # Queue to store i2c IO input 
+            # I2C Queue to store i2c IO input 
             self.MESSAGE_QUEUE = Queue()
 
-            # Mock IO
+            # I2C Mock IO
             self.BOL_MOCK_IO = True
+
+            # I2C STATE
+            self.STATE = None
+            self.ADDRESS_MAPPING = None
       
     instance = None
     def __init__(self,arg=None) -> None:
