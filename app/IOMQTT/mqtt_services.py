@@ -1,10 +1,11 @@
-import json
+import json , socket
 from threading import Thread
-from typing import List, Mapping
+from typing import List, Mapping, Union
 from termcolor import colored
 import time
 from datetime import datetime
 from json import JSONEncoder
+from app.EventManager.state_services import EventState
 
 
 # module
@@ -45,13 +46,16 @@ class MqttServices(MqttClientInterface):
         except Exception as e :
             print(colored('MQTT request_configuration()','red'),f"{e.args}")
     
-    def reply_event_changed(self,event_status:str=None):
+    def reply_event_changed(self,event_status:str=None , updateType:str=None , event_detail:dict = None):
         ''' 
         #Returns None
 
         #Parameters:
             event_status(list) : The light event for each address. 
                                  e.g = [1,1,0] The element order is follow according to the address of raspberryPI IO.
+            
+            updateType(str) : The update type either Passive or Active.
+                                e.g Passive indicate the IO trigger changes where Active refer to the fix interval update.
         
         #Return:
             None : Broadcast and emit message to broker
@@ -60,12 +64,15 @@ class MqttServices(MqttClientInterface):
         try :
             payload = dict(
                 light_event = event_status ,
+                detail = event_detail ,
+                update_type = updateType ,
                 mac_client_id = MQTTCON.MAC_CLIENT_ID ,
                 client_id = MQTTCON.CLIENT_ID ,
-                tower_type = MQTTCON.TOWER_TYPE
+                tower_type = MQTTCON.TOWER_TYPE ,
+                dt = datetime.now()
             )
             payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
-            mqtt_client.publish_topic(payload,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplyEvent.value)
+            mqtt_client.publish_topic(payload,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplyEvent.value,2,True)
         except Exception as e :
             print(colored('MQTT reply_event_changed()','red'),f"{e.args}")
 
@@ -166,6 +173,35 @@ class MqttServices(MqttClientInterface):
         except Exception as e :
             print(colored('MQTT update_configration()','red'),f"{e.args}")
     
+    def send_message(self):
+        try :
+            # pop incoming queue , add to another execution_queue variable
+            while len(MQTTCON.SEND_MESSAGE_QUEUE.queue) > 0:
+
+                message = MQTTCON.SEND_MESSAGE_QUEUE.get()
+
+                if len(message) != 3 :
+                    continue
+
+                eventState,route,updateType = message
+                eventState : Union[EventState, str]
+
+                print(eventState,route,updateType)
+
+                if route == ClientPublishTopic.ReplyEvent.value :
+                    self.reply_event_changed(event_status= eventState.EventLightArray,updateType= updateType , event_detail=eventState.EventLightDetailed)
+                elif route == ClientPublishTopic.ReplyErrorLog.value :
+                    self.reply_error(eventState)
+                elif route == ClientPublishTopic.ReplyService.value :
+                    pass
+                
+            
+
+                MQTTCON.SEND_MESSAGE_QUEUE.task_done()
+
+
+        except Exception as e :
+            print(colored('MQTT receive_incoming_message()','red'),f"{e.args}")
 
 def _receive_incoming_message()-> list:
     ''' 
@@ -201,7 +237,7 @@ def mqtt_consumer():
     def _loop_start():
         while True :
             try :
-                
+                mServices.send_message()
                 mServices.resend_message()
                 
                 if MQTTCON.BOL_IS_RECEIVED :
@@ -231,13 +267,18 @@ def mqtt_consumer():
                                 mServices.update_configuration(client_payload)
                                 mServices.reply_ack(client_topic)
                                 pass
+                            elif client_topic == PublishTopic.ReplyAck.value :
+                                pass
                                                    
                     # TURN OFF THE FLAG
                     MQTTCON.BOL_IS_RECEIVED = False
                 
                 time.sleep(0.5)
+
             except Exception as e :
-                print(colored('MQTT mqtt_consumer()','red'),f"{e.args}")
+                msg = f"mqtt_consumer() While loop {e.arq}"
+                print(colored('MQTT mqtt_consumer()','red'),msg)
+                MQTTCON.addErrorMessage(msg)
     
     # Consumer driver code
     mServices = MqttServices('rasp')

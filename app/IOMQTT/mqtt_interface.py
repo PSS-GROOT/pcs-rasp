@@ -26,3 +26,6 @@ class MqttClientInterface(metaclass=ABCMeta):
 
     @abstractmethod
     def update_configuration(self): raise NotImplementedError
+
+    @abstractmethod
+    def send_message(self): raise NotImplementedError

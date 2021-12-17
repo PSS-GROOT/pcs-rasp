@@ -121,11 +121,11 @@ def on_disconnect(client, userdata, rc=0):
 
 #endregion
 
-def mqtt_broadcast(msg, topic):
+def mqtt_broadcast(msg, topic,qos=0,retain=False):
     """ encapsulate send message hence other module does not require to import the client object and not accessible to client object, they can use this function send message to specific topic """
     try :
         if client :
-            client.publish(topic, msg, qos=0, retain=False)
+            client.publish(topic, msg, qos=qos, retain=retain)
             print(colored('MQTT Outgoing','green'),f"{msg},\n to {topic}")
         else :
             print(colored('MQTT','green'),f"mqtt_broadcast() unable to broadcast due to client is None {client}.")
@@ -147,10 +147,15 @@ def subscribe_topic():
 def client_subscribe_topic(client_id:str):
     for e in PublishTopic :
         topic = f"{client_id}{e.value}"
-        client.subscribe(topic)
+
+        if e.value == '/server/event':
+            client.subscribe(topic,qos=2)
+            print(colored('MQTT subscribe_topic()','green'),f"{topic} , qos {2}")
+        else :
+            client.subscribe(topic)
         print(colored('MQTT subscribe_topic()','green'),topic)
 
-def publish_topic(payload,client_id:int, topic_selection:str):
+def publish_topic(payload,client_id:int, topic_selection:str,qos:int=0,retain=False):
     topic =  f"{client_id}{topic_selection}"
-    mqtt_broadcast(payload,topic)
+    mqtt_broadcast(payload,topic,qos,retain)
 

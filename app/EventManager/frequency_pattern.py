@@ -1,14 +1,19 @@
 
+''' 
+
+This module define the pattern to capture , and frequency manager that plug all those 
+pattern variants and return a set of results 
+
+'''
+
 from typing import List, Tuple
+
+from termcolor import colored
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration
+from app.enum_type import LightEvent
 
 
 MQTTCON = MQTTConfiguration().instance
-
-# Rules & Pattern (Sort by priority)
-# Consecutive on (n alphabet for each color on)
-# Consecutive off (n alphabet for each color off)
-
 
 
 class FrequencyManager():
@@ -27,10 +32,10 @@ class FrequencyManager():
 
 
     def PatternFactory(self):
-        self.PatternVariants.append(PV.PatternSolidOn)
-        self.PatternVariants.append(PV.PatternSolidOff)
-        self.PatternVariants.append(PV.PatternSlowFlash)
-        self.PatternVariants.append(PV.PatternFastFlash)
+        self.PatternVariants.append(PV.SolidOn)
+        self.PatternVariants.append(PV.SolidOff)
+        self.PatternVariants.append(PV.SlowFlashing)
+        self.PatternVariants.append(PV.FastFlashing)
         # print(self.PatternVariants)
 
     def PatternProcessor(self,address:tuple):
@@ -43,17 +48,18 @@ class FrequencyManager():
 
             for func in self.PatternVariants :
                 if func(_data) : 
-                    resultList[_address] = func.__name__
-                    print(f"Rules MATCHED - {func.__name__}")
+                    lightEnum = LightEvent[func.__name__]
+                    resultList[_address] =  dict(type=lightEnum._name_,code=lightEnum.value)
+                    print(colored(f"Rules MATCHED - {func.__name__}",'green'))
                     break
                 else :
-                    print(f"Rules FAILED - {func.__name__} next rules")
+                    print(colored(f"Rules FAILED - {func.__name__} next rules",'red'))
 
             # if no rules match
             if resultList[_address] == None :
-                resultList[_address] = 'UNKNOWN'
-                print(resultList,"Set UNKNOWN")
-            
+                resultList[_address] =  dict(type=LightEvent.Unknown._name_,code=LightEvent.Unknown.value)
+                print(colored(f"Rules Unknown MATCHED - {LightEvent.Unknown._name_}",'green'))
+               
 
         return resultList   
 
@@ -77,7 +83,7 @@ class PatternVariant():
 
         '''
 
-    def PatternSolidOn(self,data):
+    def SolidOn(self,data):
         targetSignal = 1
         for j in data :
             if j != targetSignal :
@@ -85,7 +91,7 @@ class PatternVariant():
 
         return True
 
-    def PatternSolidOff(self,data):
+    def SolidOff(self,data):
         targetSignal = 2
         for j in data :
             if j != targetSignal :
@@ -93,7 +99,7 @@ class PatternVariant():
 
         return True
 
-    def PatternFastFlash(self,data):
+    def FastFlashing(self,data):
         # first signal either on or off also can
         # 1212121212
         # 2121212121
@@ -119,7 +125,9 @@ class PatternVariant():
         else :
             return False
     
-    def PatternSlowFlash(self,data):
+    def SlowFlashing(self,data):
         pass
+
+
 
 PV = PatternVariant()

@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 import unittest
 from unittest.mock import MagicMock, Mock
-from app.EventManager.frequency_pattern import PatternVariant , FrequencyManager
+from app.EventManager import PatternVariant , FrequencyManager
 
 
 class test_frequency_pattern(unittest.TestCase):
@@ -31,9 +31,9 @@ class test_frequency_pattern(unittest.TestCase):
 
         result = self.result
         
-        self.assertEqual(result['port1'],PV.PatternFastFlash.__name__)
-        self.assertEqual(result['port2'],PV.PatternSolidOff.__name__)
-        self.assertEqual(result['port3'],PV.PatternSolidOn.__name__)
+        self.assertEqual(result['port1']['type'],PV.FastFlashing.__name__)
+        self.assertEqual(result['port2']['type'],PV.SolidOff.__name__)
+        self.assertEqual(result['port3']['type'],PV.SolidOn.__name__)
 
     def test_fastFlash_invalid(self):
         data = {
@@ -46,9 +46,9 @@ class test_frequency_pattern(unittest.TestCase):
         result = self.result
 
         print(result)
-        self.assertNotEqual(result['port1'],PV.PatternFastFlash.__name__)
-        self.assertEqual(result['port2'],PV.PatternSolidOff.__name__)
-        self.assertEqual(result['port3'],PV.PatternSolidOn.__name__)
+        self.assertNotEqual(result['port1']['type'],PV.FastFlashing.__name__)
+        self.assertEqual(result['port2']['type'],PV.SolidOff.__name__)
+        self.assertEqual(result['port3']['type'],PV.SolidOn.__name__)
 
 
     def test_solidOnsolidOff_valid(self):
@@ -61,9 +61,9 @@ class test_frequency_pattern(unittest.TestCase):
 
         result = self.result
         
-        self.assertEqual(result['port1'],PV.PatternSolidOn.__name__)
-        self.assertEqual(result['port2'],PV.PatternSolidOff.__name__)
-        self.assertEqual(result['port3'],PV.PatternSolidOn.__name__)
+        self.assertEqual(result['port1']['type'],PV.SolidOn.__name__)
+        self.assertEqual(result['port2']['type'],PV.SolidOff.__name__)
+        self.assertEqual(result['port3']['type'],PV.SolidOn.__name__)
 
     def test_solidOnsolidOff_4tower_valid(self):
         data = {
@@ -75,8 +75,8 @@ class test_frequency_pattern(unittest.TestCase):
 
         result = self.result
         
-        self.assertEqual(result['port1'],PV.PatternSolidOn.__name__)
-        self.assertEqual(result['port2'],PV.PatternSolidOff.__name__)
-        self.assertEqual(result['port3'],PV.PatternSolidOn.__name__)
-        self.assertEqual(result['port4'],PV.PatternSolidOn.__name__)
+        self.assertEqual(result['port1']['type'],PV.SolidOn.__name__)
+        self.assertEqual(result['port2']['type'],PV.SolidOff.__name__)
+        self.assertEqual(result['port3']['type'],PV.SolidOn.__name__)
+        self.assertEqual(result['port4']['type'],PV.SolidOn.__name__)
 
