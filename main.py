@@ -1,5 +1,5 @@
 import test
-from app.IOConnectionManager.i2cHandler import i2cHandler
+from app.IOConnectionManager import i2c_client
 from app.IOMQTT import mqtt_client , mqtt_services
 from concurrent.futures import ThreadPoolExecutor
 import threading
@@ -27,7 +27,7 @@ if __name__ == "__main__" :
             client_id = hex(get_mac())
 
         backgroundTask(client_id)
-        i2cHandler()
+        i2c_client.i2cModule()
 
     except Exception as e :
         print(e.args)

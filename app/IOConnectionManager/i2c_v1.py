@@ -1,5 +1,12 @@
+from __future__ import annotations
 import time
 import smbus2 as smbus
+from app.EventManager import StateServices
+
+def i2c_connection(stateServices : StateServices):
+    print("i2c havent implement , please get demo set and only start development.")
+
+
 
 i2c_ch = 1
 
@@ -9,12 +16,6 @@ i2c_address = 0x48
 # Register addresses
 reg_temp = 0x00
 reg_config = 0x01
-
-# Calculate the 2's complement of a number
-def twos_comp(val, bits):
-    if (val & (1 << (bits - 1))) != 0:
-        val = val - (1 << bits)
-    return val
 
 # Read temperature registers and calculate Celsius
 def read_temp():
@@ -36,26 +37,35 @@ def read_temp():
 
     return temp_c
 
-# Initialize I2C (SMBus)
-bus = smbus.SMBus(i2c_ch)
 
-# Read the CONFIG register (2 bytes)
-val = bus.read_i2c_block_data(i2c_address, reg_config, 2)
-print("Old CONFIG:", val)
+def initialize_i2c():
+  
 
-# Set to 4 Hz sampling (CR1, CR0 = 0b10)
-val[1] = val[1] & 0b00111111
-val[1] = val[1] | (0b10 << 6)
+    # Calculate the 2's complement of a number
+    def twos_comp(val, bits):
+        if (val & (1 << (bits - 1))) != 0:
+            val = val - (1 << bits)
+        return val
+    # Initialize I2C (SMBus)
+    bus = smbus.SMBus(i2c_ch)
 
-# Write 4 Hz sampling back to CONFIG
-bus.write_i2c_block_data(i2c_address, reg_config, val)
+    # Read the CONFIG register (2 bytes)
+    val = bus.read_i2c_block_data(i2c_address, reg_config, 2)
+    print("Old CONFIG:", val)
 
-# Read CONFIG to verify that we changed it
-val = bus.read_i2c_block_data(i2c_address, reg_config, 2)
-print("New CONFIG:", val)
+    # Set to 4 Hz sampling (CR1, CR0 = 0b10)
+    val[1] = val[1] & 0b00111111
+    val[1] = val[1] | (0b10 << 6)
 
-# Print out temperature every second
-while True:
-    temperature = read_temp()
-    print(round(temperature, 2), "C")
-    time.sleep(1)
+    # Write 4 Hz sampling back to CONFIG
+    bus.write_i2c_block_data(i2c_address, reg_config, val)
+
+    # Read CONFIG to verify that we changed it
+    val = bus.read_i2c_block_data(i2c_address, reg_config, 2)
+    print("New CONFIG:", val)
+
+    # Print out temperature every second
+    while True:
+        temperature = read_temp()
+        print(round(temperature, 2), "C")
+        time.sleep(1)

@@ -1,15 +1,19 @@
 from enum import Enum
 
 class PublishTopic(Enum):
-    Config = "/server/config"
-    Ping = "/server/ping"
-    ConfigUpdate = "/server/config/update"
+    Config = "/server/config"                   # Server push config to client (redundant with below)
+    Ping = "/server/ping"                       # Server request ping
+    ConfigUpdate = "/server/config/update"      # Server push config to client (redundant with above)
+    Event = "/server/event"                     # Server request event status
+    ReplyAck = "/server/ack"
 
 class ClientPublishTopic(Enum):
-    RequestConfig = "/client/config"
-    ReplyService = "/client/service"
-    ReplyEvent = "/client/event"
-    ReplyErrorLog = "/client/error"
+    RequestConfig = "/client/config"            # Client request config
+    ReplyService = "/client/service"            # Client feedback service status    
+    ReplyEvent = "/client/event"                # Client feedback event light status
+    ReplyErrorLog = "/client/error"             # Client error message
+    ReplyAck = "/client/ack"                    # Client ack message
+    ReplyPong = "/client/pong"                  # Client feedback pong, trigger by PublishTopic(Enum).Ping
 
 class TowerType(Enum):
     ''' Use by repo pcs-rasp '''
@@ -54,3 +58,13 @@ class EventDesc(Enum):
     Warning = 2         #Amber solid on and other Solidoff   || Amber on , green on || Ambet on , green in [2,3,4,5]
     Alert = 3           #Red solid on and other Solidoff  
     Down = 5            # All off
+
+
+class ServiceStatus(Enum):
+    Available = 1
+    Inactive = 0
+
+class EventChangeType(Enum):
+    ''' Use in /client/event topic , send from client '''
+    Active = "Active"       # When rasp push update to server based on the threshold of fix interval that set by server.
+    Passive = "Passive"     # When rasp detect there is a changes in tower light signal, hence the update_type will consider 'Passive'

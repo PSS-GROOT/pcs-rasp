@@ -1,5 +1,6 @@
 
 from datetime import datetime
+from queue import Queue
 
 
 class MQTTConfiguration:
@@ -11,6 +12,12 @@ class MQTTConfiguration:
             self.RECONNECT_INTERVAL = 15
             self.TOWER_TYPE = None
             self.FREQUENCY = 0
+            self.INTERVAL_UPDATE = 30
+            self.BOL_INTERVAL_UPDATE = True
+            
+            # Mqtt Resend Setting
+            self.EVENT_RESEND_INTERVAL = 10
+            self.BOL_RESEND = True
 
             # Mqtt Constant
             self.BOL_IS_RECEIVED = True
@@ -18,7 +25,14 @@ class MQTTConfiguration:
      
             # Request Setting Constant
             self.BOL_SETTING_SUCCESS = False
-            self.REQUEST_RESEND_INTERVAL = 3
+            self.REQUEST_RESEND_INTERVAL = 10
+
+            # Outgoing Queue
+            self.SEND_MESSAGE_QUEUE = Queue()
+            self.RESEND_QUEUE = Queue()
+        
+        def addErrorMessage(self,errorDesc):
+            self.SEND_MESSAGE_QUEUE.put([errorDesc,'/client/error',None])
 
       
     instance = None
