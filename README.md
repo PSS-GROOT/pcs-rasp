@@ -1,6 +1,9 @@
 # pcs-rasp
 Backend services that targeted install on raspberry-pi. Collect data from i2c IO and publish to mqtt broker with specify topic. 
 
+### Usage (Server must got the record for every device and able to response setting)
+1. For single device simulation run > python main.py
+2. For multiple device simulation , edit configureMock.py and run > python configureMock.py (device mac address mock from integer 1 and increment by 1 for next device.)
 
 ### Thread
 1. Main thread : i2c connection and handler.
@@ -15,7 +18,9 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
 5. Rasp implement busy loop pattern and read i2c bus protocol to obtain tower light signal.
 6. Rasp read IO based on tower type and processes the data.
 7. Rasp update tower light event to server upon detected changes.
+    > Answer : rasp will auto detect , in app.EventManager.state_services.py
 8. Rasp update tower light event to server in fix interval.
+    > Answer : can set in app.IOMQTT.mqtt_singleton.py
 9. Rasp apply time out setting (in Seconds) to limit the time for running. (When to resume ?)
     > Answer :
 
@@ -97,4 +102,5 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
     - https://www.c3controls.com/white-paper/selecting-installing-tower-lights/
     
 
-
+7. To run simulation in batch
+    > python configureMock.py
