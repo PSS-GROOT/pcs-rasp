@@ -1,33 +1,34 @@
-# thread 1
-# Connect Server MQTT and Retry if fail
-    # retry
-    # request setting until success , interval
-    # send services status
+import test
+from app.IOConnectionManager.i2cHandler import i2cHandler
+from app.IOMQTT import mqtt_client , mqtt_services
+from concurrent.futures import ThreadPoolExecutor
+import threading
+from uuid import getnode as get_mac
+import sys
+
+executor = ThreadPoolExecutor(2)
 
 
-# thread 2
-# Connect to i2c connection and Retry if fail
+
+def backgroundTask(client_id):
+    executor.submit(mqtt_client.init_client(type='client',name='pcs-rasp',client_id=client_id))
+    executor.submit(mqtt_services.mqtt_consumer())
 
 
+if __name__ == "__main__" :
+    try :
+        if len(sys.argv) == 2:
+            # Invoke with argument , probably is simulation.
+            client_id = sys.argv[1]
+            print(client_id)
 
-# global singletone variable
-# i2c_connection
-# mqtt_connection`
-import json
-count = 0
-skip = ['5,4','5,5','5,1','5,2']
-data = []
-for x in range(5,0,-1):
-    for y in range(5,0,-1):
-        for z in range(5,2,-1):
-            cur = f'{x},{y}'
-            if cur in skip :
-                continue
-            count += 1
-            # print(x,y,z)
-            print(count)
-            data.append(dict(x=x,y=y,z=z,uid=count))
+        elif len(sys.argv) == 1 :
+            # Invoke without argument , probably is production mode with real rasp.
+            client_id = hex(get_mac())
 
-print(data)
+        backgroundTask(client_id)
+        i2cHandler()
 
-print(json.dumps(data))
+    except Exception as e :
+        print(e.args)
+   
