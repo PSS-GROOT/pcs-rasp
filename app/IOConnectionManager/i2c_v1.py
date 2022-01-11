@@ -1,6 +1,13 @@
 from __future__ import annotations
 import time
-import smbus2 as smbus
+
+import os
+
+if os.name == 'nt':
+    print("WINDOW OS - Skip import smbus due to Tthe fcntl module is not available on Windows")
+else :
+    import smbus2 as smbus
+
 from app.EventManager import StateServices
 
 def i2c_connection(stateServices : StateServices):
