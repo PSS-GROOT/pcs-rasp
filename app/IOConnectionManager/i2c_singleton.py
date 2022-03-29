@@ -13,7 +13,7 @@ class I2CConfiguration:
             self.MESSAGE_QUEUE = Queue()
 
             # I2C Mock IO
-            self.BOL_MOCK_IO = False
+            self.BOL_MOCK_IO = True
 
             # I2C STATE
             self.STATE = None

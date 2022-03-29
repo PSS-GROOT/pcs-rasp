@@ -3,15 +3,15 @@ import time ,datetime
 import os
 from app.IOConnectionManager.i2c_singleton import I2CConfiguration
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration
-from smbus2 import SMBus
+
 
 MQTTCON = MQTTConfiguration().instance
 I2CCON = I2CConfiguration().instance
 
-# if os.name == 'nt':
-#     print("WINDOW OS - Skip import smbus due to Tthe fcntl module is not available on Windows")
-# else :
-#     import smbus2 as smbus
+if os.name == 'nt':
+    print("WINDOW OS - Skip import smbus due to Tthe fcntl module is not available on Windows")
+else :
+    from smbus2 import SMBus
     
 
 from app.EventManager import StateServices
@@ -40,20 +40,29 @@ reg_27 = 0x27
 reg_config = 0x01
 
 def readi2c():
+    ''' e.g reading value from i2c protocol for tower light device.
+    
+    Tower (3 type)
+    Address 0x01 = 251 Green
+    Address 0x01 = 249 Orange + Green
+    Address 0x01 = 253 Orange
+    Address 0x01 = 252 Red + Orange
+    Address 0x01 = 254 Red
+    Address 0x01 = 250 Red + Green
+    Address 0x01 = 248 All On
+    Address 0x01 = 255 all Off
+    '''
+
     bus1 = SMBus(1)
     time.sleep(2)
-    bytesList = bytes([0x00, 0x01, 0x02, 0x03, 0x04, 0x05,0x06, 0x07, 0x08, 0x09, 0x10, 0x11,
-                 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,0x18, 0x18, 0x19, 0x20, 0x21, 0x22,
-                       0x23, 0x24,0x25, 0x26,0x27, 0x28])
+    bytesList = bytes([0x01])
+    # bytesList = bytes([0x00, 0x01, 0x02, 0x03, 0x04, 0x05,0x06, 0x07, 0x08, 0x09, 0x10, 0x11,
+    #              0x12, 0x13, 0x14, 0x15, 0x16, 0x17,0x18, 0x18, 0x19, 0x20, 0x21, 0x22,
+    #                    0x23, 0x24,0x25, 0x26,0x27, 0x28])
     while True :
         try :
             intFrequency = MQTTCON.FREQUENCY
 
-            # Read temperature registers
-    #        val20 = bus1.read_i2c_block_data(i2c_address, reg_20, 2)
-    #        val21 = bus1.read_i2c_block_data(i2c_address, reg_21, 2)
-    #        val22 = bus1.read_i2c_block_data(i2c_address, reg_22, 2)
-#            val23 = bus1.read_i2c_block_data(i2c_address, reg_23, 2)
             for x in bytesList :
                 try :
                     data = bus1.read_byte_data(i2c_address,x)
@@ -62,10 +71,6 @@ def readi2c():
                     print(e)
                     continue
                 
-    #        print(val24,'0x24')
-    #        print(val25,'0x25')
-    #        print(val26,'0x26')
-    #        print(val27,'0x27')
 
             # data = dict(data = temp_data ,address = ('port1','port2','port3') )
 

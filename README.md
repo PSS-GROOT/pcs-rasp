@@ -56,6 +56,16 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
         python -m app.mqtt.mqtt_mock_rasp {client_id:int}
         python -m app.mqtt.mqtt_mock_rasp 1234
 
+    1. Example request config to rasp-be via MQTT:
+
+    ![PCS-RASP-CONFIG](docs/MQTT_CLIENT_CONFIGURATION_PROTOCOL.png)
+
+
+    2. Example output to rasp-be via MQTT :
+
+    ![PCS-RASP-OUTGOING](docs/MQTT_CLIENT_TOWEREVENT_PROTOCOL.png)
+
+
     > Listen topic via terminal  / cmd
         cd to mosquitto installed path
 
