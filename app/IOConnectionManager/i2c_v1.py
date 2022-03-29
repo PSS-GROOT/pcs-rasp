@@ -1,5 +1,5 @@
 from __future__ import annotations
-import time
+import time ,datetime
 import os
 from app.IOConnectionManager.i2c_singleton import I2CConfiguration
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration
@@ -41,34 +41,43 @@ reg_config = 0x01
 
 def readi2c():
     bus1 = SMBus(1)
-
+    time.sleep(2)
+    bytesList = bytes([0x00, 0x01, 0x02, 0x03, 0x04, 0x05,0x06, 0x07, 0x08, 0x09, 0x10, 0x11,
+                 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,0x18, 0x18, 0x19, 0x20, 0x21, 0x22,
+                       0x23, 0x24,0x25, 0x26,0x27, 0x28])
     while True :
-        intFrequency = MQTTCON.FREQUENCY
+        try :
+            intFrequency = MQTTCON.FREQUENCY
 
-        # Read temperature registers
-        val20 = bus1.read_i2c_block_data(i2c_address, reg_20, 2)
-        val21 = bus1.read_i2c_block_data(i2c_address, reg_21, 2)
-        val22 = bus1.read_i2c_block_data(i2c_address, reg_22, 2)
-        val23 = bus1.read_i2c_block_data(i2c_address, reg_23, 2)
-        val24 = bus1.read_i2c_block_data(i2c_address, reg_24, 2)
-        val25 = bus1.read_i2c_block_data(i2c_address, reg_25, 2)
-        val26 = bus1.read_i2c_block_data(i2c_address, reg_26, 2)
-        val27 = bus1.read_i2c_block_data(i2c_address, reg_27, 2)
-    
-        print(val20,'0x20')
-        print(val21,'0x21')
-        print(val22,'0x22')
-        print(val23,'0x23') 
-        print(val24,'0x24')
-        print(val25,'0x25')
-        print(val26,'0x26')
-        print(val27,'0x27')
+            # Read temperature registers
+    #        val20 = bus1.read_i2c_block_data(i2c_address, reg_20, 2)
+    #        val21 = bus1.read_i2c_block_data(i2c_address, reg_21, 2)
+    #        val22 = bus1.read_i2c_block_data(i2c_address, reg_22, 2)
+#            val23 = bus1.read_i2c_block_data(i2c_address, reg_23, 2)
+            for x in bytesList :
+                try :
+                    data = bus1.read_byte_data(i2c_address,x)
+                    print(f"Read Device Address:{i2c_address},Register Address:{x}, Data:{data}")
+                except Exception as e :
+                    print(e)
+                    continue
+                
+    #        print(val24,'0x24')
+    #        print(val25,'0x25')
+    #        print(val26,'0x26')
+    #        print(val27,'0x27')
 
-        # data = dict(data = temp_data ,address = ('port1','port2','port3') )
+            # data = dict(data = temp_data ,address = ('port1','port2','port3') )
 
-        # I2CCON.MESSAGE_QUEUE.put(data)
+            # I2CCON.MESSAGE_QUEUE.put(data)
 
-        time.sleep(1)
+            time.sleep(1)
+        except OSError as e :
+            time.sleep(10)
+            msg =f"{datetime.datetime.now()} {e.args} Remote I/O error." \
+            "An I2C device is not connected to the bus." \
+            "Make sure that the sensors and micro OLED are securely connected to the I2C bus."
+            print(msg)
 
 
 def initialize_i2c():
