@@ -104,3 +104,13 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
 
 7. To run simulation in batch
     > python configureMock.py
+
+
+8. To enable i2c on raspberry
+    > sudo raspi-config
+    > select 5 Interfacing Options
+    > select P5 I2C
+
+9. To see all the connected devices
+    > sudo i2cdetect -y 1
+    

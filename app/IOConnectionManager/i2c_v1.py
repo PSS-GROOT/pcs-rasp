@@ -1,48 +1,74 @@
 from __future__ import annotations
 import time
-
 import os
+from app.IOConnectionManager.i2c_singleton import I2CConfiguration
+from app.IOMQTT.mqtt_singleton import MQTTConfiguration
+from smbus2 import SMBus
 
-if os.name == 'nt':
-    print("WINDOW OS - Skip import smbus due to Tthe fcntl module is not available on Windows")
-else :
-    import smbus2 as smbus
+MQTTCON = MQTTConfiguration().instance
+I2CCON = I2CConfiguration().instance
+
+# if os.name == 'nt':
+#     print("WINDOW OS - Skip import smbus due to Tthe fcntl module is not available on Windows")
+# else :
+#     import smbus2 as smbus
+    
 
 from app.EventManager import StateServices
 
 def i2c_connection(stateServices : StateServices):
-    print("i2c havent implement , please get demo set and only start development.")
+    print("Thread i2c starting.")
+    readi2c()
 
-
-
+# https://www.electronicwings.com/raspberry-pi/python-based-i2c-functions-for-raspberry-pi
+#  I2C port no. i.e. 0 or 1
 i2c_ch = 1
 
-# TMP102 address on the I2C bus
-i2c_address = 0x48
+# address on the I2C bus
+i2c_address = 0x23
 
 # Register addresses
-reg_temp = 0x00
+reg_20 = 0x20
+reg_21 = 0x21
+reg_22 = 0x22
+reg_23 = 0x23
+reg_24 = 0x24
+reg_25 = 0x25
+reg_26 = 0x26
+reg_27 = 0x27
+
 reg_config = 0x01
 
-# Read temperature registers and calculate Celsius
-def read_temp():
+def readi2c():
+    bus1 = SMBus(1)
 
-    # Read temperature registers
-    val = bus.read_i2c_block_data(i2c_address, reg_temp, 2)
-    # NOTE: val[0] = MSB byte 1, val [1] = LSB byte 2
-    #print ("!shifted val[0] = ", bin(val[0]), "val[1] = ", bin(val[1]))
+    while True :
+        intFrequency = MQTTCON.FREQUENCY
 
-    temp_c = (val[0] << 4) | (val[1] >> 4)
-    #print (" shifted val[0] = ", bin(val[0] << 4), "val[1] = ", bin(val[1] >> 4))
-    #print (bin(temp_c))
+        # Read temperature registers
+        val20 = bus1.read_i2c_block_data(i2c_address, reg_20, 2)
+        val21 = bus1.read_i2c_block_data(i2c_address, reg_21, 2)
+        val22 = bus1.read_i2c_block_data(i2c_address, reg_22, 2)
+        val23 = bus1.read_i2c_block_data(i2c_address, reg_23, 2)
+        val24 = bus1.read_i2c_block_data(i2c_address, reg_24, 2)
+        val25 = bus1.read_i2c_block_data(i2c_address, reg_25, 2)
+        val26 = bus1.read_i2c_block_data(i2c_address, reg_26, 2)
+        val27 = bus1.read_i2c_block_data(i2c_address, reg_27, 2)
+    
+        print(val20,'0x20')
+        print(val21,'0x21')
+        print(val22,'0x22')
+        print(val23,'0x23') 
+        print(val24,'0x24')
+        print(val25,'0x25')
+        print(val26,'0x26')
+        print(val27,'0x27')
 
-    # Convert to 2s complement (temperatures can be negative)
-    temp_c = twos_comp(temp_c, 12)
+        # data = dict(data = temp_data ,address = ('port1','port2','port3') )
 
-    # Convert registers value to temperature (C)
-    temp_c = temp_c * 0.0625
+        # I2CCON.MESSAGE_QUEUE.put(data)
 
-    return temp_c
+        time.sleep(1)
 
 
 def initialize_i2c():
@@ -54,7 +80,7 @@ def initialize_i2c():
             val = val - (1 << bits)
         return val
     # Initialize I2C (SMBus)
-    bus = smbus.SMBus(i2c_ch)
+    bus = SMBus(i2c_ch)
 
     # Read the CONFIG register (2 bytes)
     val = bus.read_i2c_block_data(i2c_address, reg_config, 2)
