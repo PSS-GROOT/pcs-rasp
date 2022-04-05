@@ -14,7 +14,7 @@ class DateTimeEncoder(JSONEncoder):
 
 
     
-def getTowerColorGroup(tower_type: TowerType)-> List[str]:
+def getTowerColorGroup(tower_type: int)-> List[str]:
     ''' 
         #Returns List[str]
 
@@ -38,7 +38,8 @@ def getTowerColorGroup(tower_type: TowerType)-> List[str]:
         elif tower_type == 5 :
             tower_type = TowerType.Five
 
-        colors = TowerTypeColor[tower_type.name]            
+        colors = TowerTypeColor[tower_type.name] 
+        print(colors)         
         return colors.value
     except Exception as e :
         print(e.args)
