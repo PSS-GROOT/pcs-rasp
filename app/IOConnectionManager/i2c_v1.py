@@ -98,7 +98,7 @@ def readi2c():
                             mockCount +=1 
 
                     
-                        print(MQTTCON.TOWER_TYPE,"This is tower type")
+                        # print(MQTTCON.TOWER_TYPE,"This is tower type")
                         output = towerToData.towerType(MQTTCON.TOWER_TYPE,int(data))
                         # print(f"Output towerToData.towerType() {output}")
 
