@@ -30,7 +30,6 @@ class FrequencyManager():
     def addIncomingData(self,incomingData : List[Tuple]):
         self.IncomingData = incomingData
 
-
     def PatternFactory(self):
         self.PatternVariants.append(PV.SolidOn)
         self.PatternVariants.append(PV.SolidOff)
@@ -69,7 +68,7 @@ class PatternVariant():
         pass
         '''
         # Solid On - each signal in same batch solid on. (1),(1),(1),(1),(1),(1)
-        # Solid Off - each signal in same batch solid off. (1),(1),(1),(1),(1),(1)
+        # Solid Off - each signal in same batch solid off. (2),(2),(2),(2),(2),(2)
         # FastFlash - each signal in same batch flashing. (1),(2),(1),(2),(1),(2)
         # SlowFlash - each signal in current batch and next batch flashing. (1),(1),(2),(2),(1),(1),(2),(2)
 
@@ -126,8 +125,35 @@ class PatternVariant():
             return False
     
     def SlowFlashing(self,data):
-        pass
 
+        if MQTTCON.SESSION_LIMIT_COUNT == 20 :
+            # Pattern 1 = 11111111112222222222
+            # Pattern 2 = 22222222221111111111
+            halfLength = int(len(data)/2)
+            firstHalf = secondHalf2nd = data[:halfLength]
+            secondHalf = firstHalf2nd = data[halfLength:]
 
+            # Check if both chunk different value
+            # Validate pattern 1
+            if firstHalf != secondHalf :
+                getFirstValue = firstHalf[0]
+                getFirstValueSecondHalf = secondHalf[0]
+                firstResult = all(x == getFirstValue for x in firstHalf)
+                secondResult = all(x == getFirstValueSecondHalf for x in secondHalf)
+
+                if firstResult and secondResult :
+                    return True
+
+            # Validate pattern 2
+            if firstHalf2nd != secondHalf2nd :
+                getFirstValue = firstHalf2nd[0]
+                getFirstValueSecondHalf = secondHalf2nd[0]
+                firstResult = all(x == getFirstValue for x in firstHalf2nd)
+                secondResult = all(x == getFirstValueSecondHalf for x in secondHalf2nd)
+
+                if firstResult and secondHalf :
+                    return True
+
+            return False
 
 PV = PatternVariant()

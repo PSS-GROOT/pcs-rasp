@@ -96,4 +96,22 @@ def _mock(tower_type):
         
         # print(currentCount,'currentCount')
         time.sleep(intFrequencyInterval)
-    
+
+
+def mockData(mockEvent : LightEvent, counter:int):
+    if LightEvent.FastFlashing == mockEvent :
+        if (counter % 2) == 0 :
+            return 255 
+        else :
+            return 248
+    elif LightEvent.SlowFlashing == mockEvent :
+        if counter < 11 :
+            return 255 
+        else :
+            return 248
+    elif LightEvent.SolidOn == mockEvent :
+        return 248
+
+    elif LightEvent.SolidOff == mockEvent :
+        return 255
+        

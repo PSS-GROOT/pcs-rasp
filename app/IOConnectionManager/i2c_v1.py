@@ -1,20 +1,26 @@
 from __future__ import annotations
+from pickle import FALSE, TRUE
 import time ,datetime
 import os
 from app.IOConnectionManager.i2c_singleton import I2CConfiguration
+from app.IOConnectionManager.mock_i2c import mockData
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration
+from app.Utilities.helper_function import getTowerColorGroup
+from app.enum_type import LightEvent
 
 
 MQTTCON = MQTTConfiguration().instance
 I2CCON = I2CConfiguration().instance
+DEV = I2CCON.BOL_MOCK_IO 
 
-if os.name == 'nt':
+if os.name == 'nt' and DEV == False :
     print("WINDOW OS - Skip import smbus due to Tthe fcntl module is not available on Windows")
 else :
-    from smbus2 import SMBus
+    if DEV == False :
+        from smbus2 import SMBus
     
 
-from app.EventManager import StateServices
+from app.EventManager import StateServices, towerToData
 
 def i2c_connection(stateServices : StateServices):
     print("Thread i2c starting.")
@@ -52,31 +58,60 @@ def readi2c():
     Address 0x01 = 248 All On
     Address 0x01 = 255 all Off
     '''
-
-    bus1 = SMBus(1)
+    if DEV == False :
+        bus1 = SMBus(1)
     time.sleep(2)
     bytesList = bytes([0x01])
     # bytesList = bytes([0x00, 0x01, 0x02, 0x03, 0x04, 0x05,0x06, 0x07, 0x08, 0x09, 0x10, 0x11,
     #              0x12, 0x13, 0x14, 0x15, 0x16, 0x17,0x18, 0x18, 0x19, 0x20, 0x21, 0x22,
     #                    0x23, 0x24,0x25, 0x26,0x27, 0x28])
+
+    # 21 reset the counter 
+    sessionData = []
+    sessionCountLimit = MQTTCON.SESSION_LIMIT_COUNT # 20 = Total duration 2 seconds if frequency is 0.1
+    currentSessionCounter = 1
+    intFrequency = MQTTCON.FREQUENCY
+    mockCount = 1
+
     while True :
         try :
-            intFrequency = MQTTCON.FREQUENCY
+            _towerAddress = tuple(getTowerColorGroup(MQTTCON.TOWER_TYPE))
 
-            for x in bytesList :
-                try :
-                    data = bus1.read_byte_data(i2c_address,x)
-                    print(f"Read Device Address:{i2c_address},Register Address:{x}, Data:{data}")
-                except Exception as e :
-                    print(e)
-                    continue
-                
+            if currentSessionCounter > sessionCountLimit :
+                # Add to queue then reset.
+                if sessionData != [] :
+                    data = dict(data = sessionData ,address = _towerAddress )
 
-            # data = dict(data = temp_data ,address = ('port1','port2','port3') )
+                    I2CCON.MESSAGE_QUEUE.put(data)
+                    print("put data in queue", data)
+                    currentSessionCounter = 1  
+                    sessionData = []
+                    print("Reset counter and empty data")
+            else :
+                for x in bytesList :
+                    try :
+                        if DEV == False :
+                            data = bus1.read_byte_data(i2c_address,x)
+                            print(f"Read Device Address:{i2c_address},Register Address:{x}, Data:{data}")
+                        else :
+                            data = mockData(LightEvent.SolidOn,mockCount)
+                            mockCount +=1 
 
-            # I2CCON.MESSAGE_QUEUE.put(data)
+                    
 
-            time.sleep(1)
+                        output = towerToData.towerType(MQTTCON.TOWER_TYPE.value,int(data))
+                        # print(f"Output towerToData.towerType() {output}")
+
+                        data_list = tuple(output)
+                        sessionData.append(data_list)
+                       
+                        currentSessionCounter +=1
+                    except Exception as e :
+                        print(e)
+                        continue
+                              
+            time.sleep(intFrequency)
+
         except OSError as e :
             time.sleep(10)
             msg =f"{datetime.datetime.now()} {e.args} Remote I/O error." \

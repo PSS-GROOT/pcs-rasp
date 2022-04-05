@@ -44,12 +44,12 @@ def i2cModule():
     frequencyManager = FrequencyManager()
     stateServices = StateServices()
 
-    if I2CCONT.BOL_MOCK_IO is True :
-        # Create mock IO thread
-        MockI2C.mock_tower_io_drivers(tower_type=TowerType.Three)
-    else :
+    # if I2CCONT.BOL_MOCK_IO is True :
+    #     # Create mock IO thread
+    #     MockI2C.mock_tower_io_drivers(tower_type=TowerType.Three)
+    # else :
         # Real i2c connection and input
-        _connect_i2c(stateServices = stateServices)
+    _connect_i2c(stateServices = stateServices)
 
 
     while True :
@@ -62,7 +62,7 @@ def i2cModule():
         for _message in message :
             print(colored('i2c Incoming','cyan'),f"{_message} , len={len(_message)}")
 
-            if len(_message['data']) == MQTTCON.FREQUENCY :
+            if len(_message['data']) == MQTTCON.SESSION_LIMIT_COUNT :
 
                 # e.g _message = {
                 #                   "data" : [(2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1)] ,

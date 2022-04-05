@@ -2,6 +2,8 @@
 from datetime import datetime
 from queue import Queue
 
+from app.enum_type import TowerType
+
 
 class MQTTConfiguration:
     class __OnlyOne:
@@ -10,8 +12,9 @@ class MQTTConfiguration:
             # Mqtt Setting (Update from server)
             self.CLIENT_ID = None
             self.RECONNECT_INTERVAL = 15
-            self.TOWER_TYPE = None
-            self.FREQUENCY = 0
+            self.TOWER_TYPE = TowerType.Three
+            self.FREQUENCY = 0.1
+            self.SESSION_LIMIT_COUNT = 20
             self.INTERVAL_UPDATE = 30
             self.BOL_INTERVAL_UPDATE = True
             

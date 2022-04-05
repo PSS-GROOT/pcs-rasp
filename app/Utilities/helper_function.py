@@ -29,4 +29,3 @@ def getTowerColorGroup(tower_type: TowerType)-> List[str]:
         return colors.value
     except Exception as e :
         print(e.args)
-

@@ -39,7 +39,7 @@ class LightEvent(Enum):
     SolidOff = 2            # 消灯      xxxxxxxxxxxxxxx
     FastFlashing = 3        # 高速点灭  |x|x|x|x|x|x|x|
     SlowFlashing = 4        # 低速点灭  ||xx||xx||xx|||
-    FlaskOnOnce = 5         # 瞬时点灯  x|xxxxxxxxxxxxx
+    FlaskOnOnce = 5         # 瞬时点灯  x|xxxxxxxxxxxx
     FlaskOffOnce = 6        # 瞬时消灯  |x|||||||||||||  
     Unknown = 0
 
@@ -68,3 +68,14 @@ class EventChangeType(Enum):
     ''' Use in /client/event topic , send from client '''
     Active = "Active"       # When rasp push update to server based on the threshold of fix interval that set by server.
     Passive = "Passive"     # When rasp detect there is a changes in tower light signal, hence the update_type will consider 'Passive'
+
+
+# Tower (3 type)
+# Address 0x01 = 248 All on
+# Address 0x01 = 249 Orange + Green
+# Address 0x01 = 250 Red + Green
+# Address 0x01 = 251 Green
+# Address 0x01 = 252 Red + Orange
+# Address 0x01 = 253 Orange
+# Address 0x01 = 254 Red
+# Address 0x01 = 255 all off

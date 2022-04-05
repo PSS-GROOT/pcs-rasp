@@ -165,8 +165,11 @@ class MqttServices(MqttClientInterface):
         try :
             for key,value in payload.items() :     
                 capitalKey = key.upper()  
-                setattr(MQTTCON, capitalKey,value)
-                print(colored('MQTT Update Config','blue'),f"Update attribute {capitalKey} value to {value}")
+                if capitalKey in ['FREQUENCY'] :
+                    print(colored('MQTT Update Config','blue'),f"Skip update attribute {capitalKey} to {value} due to predefined rules agree that frequency is set to 0.1 seconds ")
+                else :
+                    setattr(MQTTCON, capitalKey,value)
+                    print(colored('MQTT Update Config','blue'),f"Update attribute {capitalKey} value to {value}")
 
             self.settingRequest.bolRequest = True
             print(colored('MQTT Request','blue'),f"Configuration acquired, rasp will stop request setting.")
