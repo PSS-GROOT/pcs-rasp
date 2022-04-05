@@ -5,9 +5,9 @@ from app.enum_type import TowerType, TowerTypeColor
 
 
 def towerType(towerType:int , readValue :int):
-    if towerType == TowerTypeColor.One.value :
+    if towerType == TowerType.One.value :
         return type1valueToColor(readValue=readValue)
-    elif towerType == TowerTypeColor.Two.value :
+    elif towerType == TowerType.Two.value :
         return type2valueToColor(readValue=readValue)
     elif towerType == TowerType.Three.value :
         return type3valueToColor(readValue=readValue)

@@ -99,7 +99,7 @@ def readi2c():
 
                     
 
-                        output = towerToData.towerType(MQTTCON.TOWER_TYPE.value,int(data))
+                        output = towerToData.towerType(MQTTCON.TOWER_TYPE,int(data))
                         # print(f"Output towerToData.towerType() {output}")
 
                         data_list = tuple(output)
