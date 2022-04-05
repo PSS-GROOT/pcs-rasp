@@ -77,39 +77,40 @@ def readi2c():
         try :
             _towerAddress = tuple(getTowerColorGroup(MQTTCON.TOWER_TYPE))
 
-            if currentSessionCounter > sessionCountLimit :
-                # Add to queue then reset.
-                if sessionData != [] :
-                    data = dict(data = sessionData ,address = _towerAddress )
+            if MQTTCON.TOWER_TYPE is not None :
+                if currentSessionCounter > sessionCountLimit :
+                    # Add to queue then reset.
+                    if sessionData != [] :
+                        data = dict(data = sessionData ,address = _towerAddress )
 
-                    I2CCON.MESSAGE_QUEUE.put(data)
-                    print("put data in queue", data)
-                    currentSessionCounter = 1  
-                    sessionData = []
-                    print("Reset counter and empty data")
-            else :
-                for x in bytesList :
-                    try :
-                        if DEV == False :
-                            data = bus1.read_byte_data(i2c_address,x)
-                            print(f"Read Device Address:{i2c_address},Register Address:{x}, Data:{data}")
-                        else :
-                            data = mockData(LightEvent.SolidOn,mockCount)
-                            mockCount +=1 
+                        I2CCON.MESSAGE_QUEUE.put(data)
+                        print("put data in queue", data)
+                        currentSessionCounter = 1  
+                        sessionData = []
+                        print("Reset counter and empty data")
+                else :
+                    for x in bytesList :
+                        try :
+                            if DEV == False :
+                                data = bus1.read_byte_data(i2c_address,x)
+                                print(f"Read Device Address:{i2c_address},Register Address:{x}, Data:{data}")
+                            else :
+                                data = mockData(LightEvent.SolidOn,mockCount)
+                                mockCount +=1 
 
-                    
-                        # print(MQTTCON.TOWER_TYPE,"This is tower type")
-                        output = towerToData.towerType(MQTTCON.TOWER_TYPE,int(data))
-                        # print(f"Output towerToData.towerType() {output}")
+                        
+                            # print(MQTTCON.TOWER_TYPE,"This is tower type")
+                            output = towerToData.towerType(MQTTCON.TOWER_TYPE,int(data))
+                            # print(f"Output towerToData.towerType() {output}")
 
-                        data_list = tuple(output)
-                        sessionData.append(data_list)
-                       
-                        currentSessionCounter +=1
-                    except Exception as e :
-                        print(e)
-                        continue
-                              
+                            data_list = tuple(output)
+                            sessionData.append(data_list)
+                        
+                            currentSessionCounter +=1
+                        except Exception as e :
+                            print(e)
+                            continue
+                                
             time.sleep(intFrequency)
 
         except OSError as e :

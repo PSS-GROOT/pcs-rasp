@@ -39,7 +39,7 @@ def getTowerColorGroup(tower_type: int)-> List[str]:
             tower_type = TowerType.Five
 
         colors = TowerTypeColor[tower_type.name] 
-        print(colors)         
+        # print(colors)         
         return colors.value
     except Exception as e :
         print(e.args)
