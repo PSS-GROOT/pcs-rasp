@@ -7,6 +7,7 @@ from app.IOConnectionManager.mock_i2c import mockData
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration
 from app.Utilities.helper_function import getTowerColorGroup
 from app.enum_type import LightEvent
+from termcolor import colored
 
 
 MQTTCON = MQTTConfiguration().instance
@@ -72,6 +73,7 @@ def readi2c():
     currentSessionCounter = 1
     intFrequency = MQTTCON.FREQUENCY
     mockCount = 1
+    rawData = []
 
     while True :
         try :
@@ -83,23 +85,26 @@ def readi2c():
                     # Add to queue then reset.
                     if sessionData != [] :
                         data = dict(data = sessionData ,address = _towerAddress )
-
+                        print(colored('i2c Raw Incoming','cyan'),f"{rawData} , len={len(rawData)}")
                         I2CCON.MESSAGE_QUEUE.put(data)
-                        print("put data in queue", data)
+                        # print("put data in queue", data)
                         currentSessionCounter = 1  
                         sessionData = []
-                        print("Reset counter and empty data")
+                        rawData = []
+                        # print("Reset counter and empty data")
                 else :
                     for x in bytesList :
                         try :
                             if DEV == False :
                                 data = bus1.read_byte_data(i2c_address,x)
-                                print(f"Read Device Address:{i2c_address},Register Address:{x}, Data:{data}")
+                                # print(f"Read Device Address:{i2c_address},Register Address:{x}, Data:{data}")
                             else :
                                 data = mockData(LightEvent.SolidOn,mockCount)
                                 mockCount +=1 
 
-                        
+                            
+                            rawData.append(data)
+                                     
                             # print(MQTTCON.TOWER_TYPE,"This is tower type")
                             output = towerToData.towerType(MQTTCON.TOWER_TYPE,int(data))
                             # print(f"Output towerToData.towerType() {output}")

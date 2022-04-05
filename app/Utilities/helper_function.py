@@ -2,8 +2,6 @@ import functools
 from json import JSONEncoder
 import datetime
 from typing import List
-from app.EventManager import towerToData
-
 from app.enum_type import TowerType, TowerTypeColor
 
 class DateTimeEncoder(JSONEncoder):
@@ -43,7 +41,6 @@ def getTowerColorGroup(tower_type: int)-> List[str]:
         return colors.value
     except Exception as e :
         print(e.args)
-
 
 
 

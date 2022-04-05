@@ -10,6 +10,7 @@ from typing import List, Tuple
 
 from termcolor import colored
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration
+from app.Utilities import helper_function
 from app.enum_type import LightEvent
 
 
@@ -35,6 +36,8 @@ class FrequencyManager():
         self.PatternVariants.append(PV.SolidOff)
         self.PatternVariants.append(PV.SlowFlashing)
         self.PatternVariants.append(PV.FastFlashing)
+        self.PatternVariants.append(PV.FlashOffOnce)
+        self.PatternVariants.append(PV.FlashOnOnce)
         # print(self.PatternVariants)
 
     def PatternProcessor(self,address:tuple):
@@ -81,7 +84,7 @@ class PatternVariant():
                 # B. SlowFlash - minimum FREQUENCY = 4
 
         '''
-
+    @helper_function.log_error()
     def SolidOn(self,data):
         targetSignal = 1
         for j in data :
@@ -90,6 +93,7 @@ class PatternVariant():
 
         return True
 
+    @helper_function.log_error()
     def SolidOff(self,data):
         targetSignal = 2
         for j in data :
@@ -98,6 +102,7 @@ class PatternVariant():
 
         return True
 
+    @helper_function.log_error()
     def FastFlashing(self,data):
         # first signal either on or off also can
         # 1212121212
@@ -124,6 +129,7 @@ class PatternVariant():
         else :
             return False
     
+    @helper_function.log_error()
     def SlowFlashing(self,data):
         if MQTTCON.SESSION_LIMIT_COUNT == 20 :
             # Pattern 1 = 11111111112222222222
@@ -155,6 +161,26 @@ class PatternVariant():
 
             return False
 
-    
+    @helper_function.log_error()
+    def FlashOffOnce(self,data):
+        #Pattern 1 = 111111111211111111
+        # The off can happen in any index
+        off = 2
+        
+        if data.count(off) == 1 :
+            return True
+
+        return False
+
+    @helper_function.log_error()
+    def FlashOnOnce(self,data):
+        #Pattern 1 = 22222221222222
+        # The on can happen in any index
+        on = 1
+        
+        if data.count(on) == 1 :
+            return True
+
+        return False
 
 PV = PatternVariant()
