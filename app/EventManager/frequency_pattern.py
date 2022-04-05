@@ -125,7 +125,6 @@ class PatternVariant():
             return False
     
     def SlowFlashing(self,data):
-
         if MQTTCON.SESSION_LIMIT_COUNT == 20 :
             # Pattern 1 = 11111111112222222222
             # Pattern 2 = 22222222221111111111
@@ -155,5 +154,7 @@ class PatternVariant():
                     return True
 
             return False
+
+    
 
 PV = PatternVariant()
