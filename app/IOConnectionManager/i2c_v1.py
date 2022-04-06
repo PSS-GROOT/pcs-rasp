@@ -1,5 +1,4 @@
 from __future__ import annotations
-from pickle import FALSE, TRUE
 import time ,datetime
 import os
 from app.IOConnectionManager.i2c_singleton import I2CConfiguration
@@ -77,8 +76,6 @@ def readi2c():
 
     while True :
         try :
-         
-
             if MQTTCON.TOWER_TYPE is not None :
                 _towerAddress = tuple(getTowerColorGroup(MQTTCON.TOWER_TYPE))
                 if currentSessionCounter > sessionCountLimit :
