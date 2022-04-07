@@ -76,8 +76,6 @@ def readi2c():
 
     while True :
         try :
-         
-
             if MQTTCON.TOWER_TYPE is not None :
                 _towerAddress = tuple(getTowerColorGroup(MQTTCON.TOWER_TYPE))
                 if currentSessionCounter > sessionCountLimit :
