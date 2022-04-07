@@ -1,5 +1,4 @@
 from __future__ import annotations
-from pickle import FALSE, TRUE
 import time ,datetime
 import os
 from app.IOConnectionManager.i2c_singleton import I2CConfiguration
@@ -85,7 +84,7 @@ def readi2c():
                     # Add to queue then reset.
                     if sessionData != [] :
                         data = dict(data = sessionData ,address = _towerAddress )
-                        print(colored('i2c Raw Incoming','cyan'),f"{rawData} , len={len(rawData)}")
+                        print(colored(f'{datetime.datetime.now()} i2c Raw Incoming','cyan'),f"{rawData} , len={len(rawData)}")
                         I2CCON.MESSAGE_QUEUE.put(data)
                         # print("put data in queue", data)
                         currentSessionCounter = 1  

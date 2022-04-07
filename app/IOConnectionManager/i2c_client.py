@@ -62,7 +62,7 @@ def i2cModule():
         message = _i2cMessageIncoming()
         
         for _message in message :
-            print(colored('i2c combined Incoming','cyan'),f"{_message} , len={len(_message)}")
+            print(colored(f'{datetime.datetime.now()} i2c combined Incoming','cyan'),f"{_message} , len={len(_message)}")
 
             if len(_message['data']) == MQTTCON.SESSION_LIMIT_COUNT :
 

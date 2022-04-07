@@ -113,7 +113,7 @@ class StateServices():
 
                 if requirePush :
                     # Require push update to server
-                    print(colored('Push Event Update','cyan'),f"{msg}")
+                    print(colored(f'{datetime.now()} Push Event Update','cyan'),f"{msg}")
                     self.currentEventLightState = EventState(self.transfromToArray(incomingChange),incomingChange)
                     self.eventLightChangeAppendQueue(EventChangeType.Passive)
                     self.dateTimeLastInform = datetime.now()

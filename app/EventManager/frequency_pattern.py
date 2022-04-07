@@ -55,7 +55,7 @@ class FrequencyManager():
                     print(colored(f"Rules MATCHED - {func.__name__}",'green'))
                     break
                 else :
-                    print(colored(f"Rules FAILED - {func.__name__} next rules",'red'))
+                    print(colored(f"Rules FAILED - {func.__name__}",'red'))
 
             # if no rules match
             if resultList[_address] == None :
