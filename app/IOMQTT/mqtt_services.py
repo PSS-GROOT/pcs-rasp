@@ -73,6 +73,8 @@ class MqttServices(MqttClientInterface):
                 update_type = updateType ,
                 mac_client_id = MQTTCON.MAC_CLIENT_ID ,
                 client_id = MQTTCON.CLIENT_ID ,
+                FREQUENCY = MQTTCON.FREQUENCY ,
+                LIMIT_FREQUENCY = MQTTCON.LIMIT_FREQUENCY ,
                 tower_type = MQTTCON.TOWER_TYPE ,
                 range = MQTTCON.rangeData() ,
                 dt = datetime.now()
@@ -82,7 +84,7 @@ class MqttServices(MqttClientInterface):
             mqtt_client.publish_topic(payload,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplyEvent.value,2,True)
 
             sampleMqttSubscription = f'mosquitto_sub -h {load_config.MQTT_HOST} -t {MQTTCON.MAC_CLIENT_ID}/client/event'
-            print(colored('MQTT subscribe','green'),f"{sampleMqttSubscription}")
+            print(colored(f'{datetime.now()} MQTT subscribe','green'),f"{sampleMqttSubscription}")
         except Exception as e :
             print(colored('MQTT reply_event_changed()','red'),f"{e.args}")
 

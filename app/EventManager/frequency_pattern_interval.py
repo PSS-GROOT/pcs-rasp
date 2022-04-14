@@ -17,7 +17,7 @@ class PatternVariantInterval():
     
     @staticmethod
     def calDuration(a):
-        return round(a * 0.1,2)
+        return round(a * MQTTCON.FREQUENCY,2)
 
     def printConsole(self,data,fromTime,toTime,accumulateList,bolResult):
         if MQTTCON.DEBUG :
