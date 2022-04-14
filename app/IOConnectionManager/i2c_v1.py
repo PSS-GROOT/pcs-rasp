@@ -68,9 +68,9 @@ def readi2c():
 
     # 21 reset the counter 
     sessionData = []
-    sessionCountLimit = MQTTCON.LIMIT_FREQUENCY # 20 = Total duration 2 seconds if frequency is 0.1
+    # sessionCountLimit = MQTTCON.LIMIT_FREQUENCY # 20 = Total duration 2 seconds if frequency is 0.1
     currentSessionCounter = 1
-    intFrequency = MQTTCON.FREQUENCY
+
     mockCount = 1
     rawData = []
 
@@ -78,7 +78,7 @@ def readi2c():
         try :
             if MQTTCON.TOWER_TYPE is not None :
                 _towerAddress = tuple(getTowerColorGroup(MQTTCON.TOWER_TYPE))
-                if currentSessionCounter > sessionCountLimit :
+                if currentSessionCounter > MQTTCON.LIMIT_FREQUENCY :
                     # Add to queue then reset.
                     if sessionData != [] :
                         data = dict(data = sessionData ,address = _towerAddress )
@@ -114,7 +114,7 @@ def readi2c():
                             print(e)
                             continue
                                 
-            time.sleep(intFrequency)
+            time.sleep(MQTTCON.FREQUENCY)
 
         except OSError as e :
             time.sleep(10)

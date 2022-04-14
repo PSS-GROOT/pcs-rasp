@@ -141,7 +141,7 @@ class StateServices():
                     self.eventLightChangeAppendQueue(EventChangeType.Passive)
                     self.dateTimeLastInform = datetime.now()
                 else :
-                    print(colored('Push Event Update','cyan'),f"Detected tower light state remain , wont push update to server.")                   
+                    print(colored(f'{datetime.now()} Push Event Update','cyan'),f"Detected tower light state remain , wont push update to server.")                   
         except Exception as e :
             MQTTCON.addErrorMessage(e.args)
 
