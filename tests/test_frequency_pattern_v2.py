@@ -2,6 +2,7 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import MagicMock, Mock
 from app.EventManager import  FrequencyManager , PatternVariantInterval
+from app.EventManager.towerToData import towerType
 
 
 class test_frequency_pattern_v2(unittest.TestCase):
@@ -60,4 +61,8 @@ class test_frequency_pattern_v2(unittest.TestCase):
 
     
       
+    def test_tower_type(self):
+        test = towerType(5,255)
+        # print(test)
 
+        self.assertEqual([2,2,2,2,2],test)
