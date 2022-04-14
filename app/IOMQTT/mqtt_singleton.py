@@ -13,7 +13,7 @@ class MQTTConfiguration:
             # Mqtt Setting (Update from server)
             self.CLIENT_ID = None
             self.RECONNECT_INTERVAL = 15
-            self.TOWER_TYPE = 3
+            self.TOWER_TYPE = None
             self.FREQUENCY = 0.1
             self.LIMIT_FREQUENCY = 20
             self.INTERVAL_UPDATE = 30
