@@ -68,7 +68,7 @@ def readi2c():
 
     # 21 reset the counter 
     sessionData = []
-    sessionCountLimit = MQTTCON.SESSION_LIMIT_COUNT # 20 = Total duration 2 seconds if frequency is 0.1
+    sessionCountLimit = MQTTCON.LIMIT_FREQUENCY # 20 = Total duration 2 seconds if frequency is 0.1
     currentSessionCounter = 1
     intFrequency = MQTTCON.FREQUENCY
     mockCount = 1
@@ -96,7 +96,7 @@ def readi2c():
                                 data = bus1.read_byte_data(i2c_address,x)
                                 # print(f"Read Device Address:{i2c_address},Register Address:{x}, Data:{data}")
                             else :
-                                data = mockData(LightEvent.SolidOn,mockCount)
+                                data = mockData(LightEvent.SolidOff,mockCount)
                                 mockCount +=1 
 
                             

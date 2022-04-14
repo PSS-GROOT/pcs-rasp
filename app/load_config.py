@@ -14,3 +14,4 @@ elif env == 'PRODUCTION' :
 elif env == "TEST" :
     pass
 
+DEBUG = os.environ.get('DEBUG',False)

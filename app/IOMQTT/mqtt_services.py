@@ -5,6 +5,7 @@ from termcolor import colored
 import time
 from datetime import datetime
 from json import JSONEncoder
+from app import load_config
 from app.EventManager.state_services import EventState
 
 
@@ -46,33 +47,42 @@ class MqttServices(MqttClientInterface):
         except Exception as e :
             print(colored('MQTT request_configuration()','red'),f"{e.args}")
     
-    def reply_event_changed(self,event_status:str=None , updateType:str=None , event_detail:dict = None):
+    def reply_event_changed(self,eventState: EventState=None , updateType:str=None):
         ''' 
         #Returns None
 
         #Parameters:
-            event_status(list) : The light event for each address. 
+            eventState(obj) : The light event for each address. 
                                  e.g = [1,1,0] The element order is follow according to the address of raspberryPI IO.
             
             updateType(str) : The update type either Passive or Active.
                                 e.g Passive indicate the IO trigger changes where Active refer to the fix interval update.
+
+
         
         #Return:
             None : Broadcast and emit message to broker
         '''
 
         try :
+            
             payload = dict(
-                light_event = event_status ,
-                detail = event_detail ,
+                light_event = eventState.EventLightArray ,
+                detail = eventState.EventLightDetailed ,
+                data = eventState.EventSignalData,
                 update_type = updateType ,
                 mac_client_id = MQTTCON.MAC_CLIENT_ID ,
                 client_id = MQTTCON.CLIENT_ID ,
                 tower_type = MQTTCON.TOWER_TYPE ,
+                range = MQTTCON.rangeData() ,
                 dt = datetime.now()
-            )
+                ),
+                      
             payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
             mqtt_client.publish_topic(payload,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplyEvent.value,2,True)
+
+            sampleMqttSubscription = f'mosquitto_sub -h {load_config.MQTT_HOST} -t {MQTTCON.MAC_CLIENT_ID}/client/event'
+            print(colored('MQTT subscribe','green'),f"{sampleMqttSubscription}")
         except Exception as e :
             print(colored('MQTT reply_event_changed()','red'),f"{e.args}")
 
@@ -165,11 +175,11 @@ class MqttServices(MqttClientInterface):
         try :
             for key,value in payload.items() :     
                 capitalKey = key.upper()  
-                if capitalKey in ['FREQUENCY'] :
-                    print(colored('MQTT Update Config','blue'),f"Skip update attribute {capitalKey} to {value} due to predefined rules agree that frequency is set to 0.1 seconds ")
-                else :
-                    setattr(MQTTCON, capitalKey,value)
-                    print(colored('MQTT Update Config','blue'),f"Update attribute {capitalKey} value to {value}")
+                # if capitalKey in ['FREQUENCY'] :
+                #     print(colored('MQTT Update Config','blue'),f"Skip update attribute {capitalKey} to {value} due to predefined rules agree that frequency is set to 0.1 seconds ")
+                # else :
+                setattr(MQTTCON, capitalKey,value)
+                print(colored('MQTT Update Config','blue'),f"Update attribute {capitalKey} value to {value}")
 
             self.settingRequest.bolRequest = True
             print(colored('MQTT Request','blue'),f"Configuration acquired, rasp will stop request setting.")
@@ -189,10 +199,12 @@ class MqttServices(MqttClientInterface):
                 eventState,route,updateType = message
                 eventState : Union[EventState, str]
 
-                print(eventState,route,updateType)
+                print(eventState,route,updateType,'eventState,route,updateType')
 
                 if route == ClientPublishTopic.ReplyEvent.value :
-                    self.reply_event_changed(event_status= eventState.EventLightArray,updateType= updateType , event_detail=eventState.EventLightDetailed)
+                    # self.reply_event_changed(event_status= eventState.EventLightArray,updateType= updateType , event_detail=eventState.EventLightDetailed)
+
+                    self.reply_event_changed(eventState,updateType= updateType)
                 elif route == ClientPublishTopic.ReplyErrorLog.value :
                     self.reply_error(eventState)
                 elif route == ClientPublishTopic.ReplyService.value :

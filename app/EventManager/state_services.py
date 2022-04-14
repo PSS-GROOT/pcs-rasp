@@ -22,18 +22,40 @@ from app.enum_type import EventChangeType, ServiceStatus
 MQTTCON = MQTTConfiguration().instance
 
 class EventState:
-    def __init__(self, eventArray , eventDetailed) -> None:
+    def __init__(self, eventArray , eventDetailed, unzipped_list) -> None:
         self.EventLightArray = eventArray
         self.EventLightDetailed = eventDetailed
+        self.EventSignalData = self.joinList(unzipped_list)
 
     def __repr__(self) -> str:
-        data = {
-            'EventLightArray' : self.EventLightArray ,
-            'EventLightDetailed' : self.EventLightDetailed
-        }
+        ''' e.g 
+        {
+            "EventLightArray": [2, 1, 2],
+            "EventLightDetailed": {
+                "Red": { "type": "SolidOff", "code": 2 }, 
+                "Amber": {"type": "SolidOff", "code": 2}, 
+                "Green": {"type": "SolidOn", "code": 1}}
+            "EventSignalData" :{
+
+            }
+        } 
+
+        '''
+        # data = {
+        #     'EventLightArray' : self.EventLightArray ,
+        #     'EventLightDetailed' : self.EventLightDetailed
+        # }
         return json.dumps(self.__dict__)
 
         
+    def joinList(self,unzipped_list):
+        newX = []
+        for x in unzipped_list :
+            string_ints = [str(int) for int in list(x)]
+            str_of_ints = "". join(string_ints) 
+            newX.append(str_of_ints)
+        return newX
+
 
 
 class StateServices():
@@ -66,22 +88,23 @@ class StateServices():
         
 
 
-    def detectChanges(self, incomingChange) -> bool :
+    def detectChanges(self, incomingChange,unzipped_list) :
         #e.g incomingChange = 
         #   {
         #       'port1': {'type': 'SolidOff', 'code': 2}, 
         #       'port2': {'type': 'SolidOff', 'code': 2}, 
         #       'port3': {'type': 'SolidOn', 'code': 1}
         #   }
+
         try :
             if self.currentEventLightState is None :
                 print("Default event is None , will update to state to StateService")
 
-                self.currentEventLightState = EventState(self.transfromToArray(incomingChange),incomingChange)
+                self.currentEventLightState = EventState(self.transfromToArray(incomingChange),incomingChange,unzipped_list)
                 self.eventLightChangeAppendQueue(EventChangeType.Passive)
                 self.dateTimeLastInform = datetime.now()
             else :
-                print(f"Default is {self.currentEventLightState} , will compare the state between StateService and latest update from I2C")
+                # print(f"Default is {self.currentEventLightState} , will compare the state between StateService and latest update from I2C")
             
                 # Check len of both array
                 incomingArray = self.transfromToArray(incomingChange)

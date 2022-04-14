@@ -63,7 +63,7 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
 
     2. Example output to rasp-be via MQTT :
 
-    ![PCS-RASP-OUTGOING](docs/MQTT_CLIENT_TOWEREVENT_PROTOCOL.png)
+    ![PCS-RASP-OUTGOING](docs/MQTT_CLIENT_TOWEREVENT_PROTOCOL2.png)
 
 
     > Listen topic via terminal  / cmd
@@ -71,6 +71,7 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
 
         e.g mosquitto_sub -h url -t topic
         e.g mosquitto_sub -h 127.0.0.1 -t 0x106530ea239e/server/config
+        e.g mosquitto_sub -h 191.168.0.171 -t 0x106530ea239e/client/event
 
     > Publish topic via terminal / cmd
         e.g mosquitto_pub -h 127.0.0.1 -t 0x106530ea239e/server/config -m "{\"tower_type\" : 1}" -d

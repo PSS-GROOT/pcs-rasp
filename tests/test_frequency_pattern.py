@@ -7,7 +7,7 @@ from app.EventManager import PatternVariant , FrequencyManager
 class test_frequency_pattern(unittest.TestCase):
     def setUp(self) -> None:
         # set up
-        self.FM = FrequencyManager()
+        self.FM = FrequencyManager(PatternVariant())
         self.PV  = PatternVariant()
         self.result = None
     def tearDown(self) -> None:

@@ -18,7 +18,7 @@ class I2CConfiguration:
             # I2C STATE
             self.STATE = None
             self.ADDRESS_MAPPING = None
-      
+
     instance = None
     def __init__(self,arg=None) -> None:
         if not I2CConfiguration.instance :

@@ -12,15 +12,17 @@ from termcolor import colored
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration
 from app.Utilities import helper_function
 from app.enum_type import LightEvent
+from app.EventManager import frequency_pattern_interval
 
 
 MQTTCON = MQTTConfiguration().instance
 
 
 class FrequencyManager():
-    def __init__(self) -> None:
+    def __init__(self,pv) -> None:
         self.PatternVariants : List[PatternVariant] = []
         self.IncomingData : List[tuple] = None
+        self.PV = pv
 
         # Decide Pattern
         self.PatternFactory()
@@ -32,12 +34,12 @@ class FrequencyManager():
         self.IncomingData = incomingData
 
     def PatternFactory(self):
-        self.PatternVariants.append(PV.SolidOn)
-        self.PatternVariants.append(PV.SolidOff)
-        self.PatternVariants.append(PV.SlowFlashing)
-        self.PatternVariants.append(PV.FastFlashing)
-        self.PatternVariants.append(PV.FlashOffOnce)
-        self.PatternVariants.append(PV.FlashOnOnce)
+        self.PatternVariants.append(self.PV.SolidOn)
+        self.PatternVariants.append(self.PV.SolidOff)
+        self.PatternVariants.append(self.PV.SlowFlashing)
+        self.PatternVariants.append(self.PV.FastFlashing)
+        self.PatternVariants.append(self.PV.FlashOffOnce)
+        self.PatternVariants.append(self.PV.FlashOnOnce)
         # print(self.PatternVariants)
 
     def PatternProcessor(self,address:tuple):
@@ -86,52 +88,57 @@ class PatternVariant():
         '''
     @helper_function.log_error()
     def SolidOn(self,data):
-        targetSignal = 1
-        for j in data :
-            if j != targetSignal :
-                return False
+        if data and len(data) > 0 : 
+            targetSignal = 1
+            for j in data :
+                if j != targetSignal :
+                    return False
 
-        return True
+            return True
+        return False
 
     @helper_function.log_error()
     def SolidOff(self,data):
-        targetSignal = 2
-        for j in data :
-            if j != targetSignal :
-                return False
+        if data and len(data) > 0 :
+            targetSignal = 2
+            for j in data :
+                if j != targetSignal :
+                    return False
 
-        return True
+            return True
 
     @helper_function.log_error()
     def FastFlashing(self,data):
         # first signal either on or off also can
         # 1212121212
         # 2121212121
-        firstSignal = data[0]
-        nextSignal = data[1]
+        if data and len(data) > 2 :
+            firstSignal = data[0]
+            nextSignal = data[1]
 
-        # Eliminate this rules approved solid on and solid off by introduce 1st and 2nd rules must not be same
-        if firstSignal != nextSignal :
+            # Eliminate this rules approved solid on and solid off by introduce 1st and 2nd rules must not be same
+            if firstSignal != nextSignal :
 
-            # Get the first signal and 3rd and following signal for validate
-            for i in range(0,len(data),2):
-                # print(f"{i} is data {data[i]}")
-                if data[i] != firstSignal :
-                    return False
+                # Get the first signal and 3rd and following signal for validate
+                for i in range(0,len(data),2):
+                    # print(f"{i} is data {data[i]}")
+                    if data[i] != firstSignal :
+                        return False
 
-            # Get 2nd signal and 4th signal and following signal for validate
-            for i in range(1,len(data),2):
-                # print(f"{i} is data {data[i]}")
-                if data[i] != nextSignal :
-                    return False
+                # Get 2nd signal and 4th signal and following signal for validate
+                for i in range(1,len(data),2):
+                    # print(f"{i} is data {data[i]}")
+                    if data[i] != nextSignal :
+                        return False
 
-            return True
-        else :
-            return False
+                return True
+            else :
+                return False
+        return False
     
     @helper_function.log_error()
     def SlowFlashing(self,data):
-        if MQTTCON.SESSION_LIMIT_COUNT == 20 :
+        if data and len(data) > 2 :
             # Pattern 1 = 11111111112222222222
             # Pattern 2 = 22222222221111111111
             halfLength = int(len(data)/2)
@@ -165,22 +172,24 @@ class PatternVariant():
     def FlashOffOnce(self,data):
         #Pattern 1 = 111111111211111111
         # The off can happen in any index
-        off = 2
-        
-        if data.count(off) == 1 :
-            return True
+        if data and len(data) > 0 :
+            off = 2
+            
+            if data.count(off) == 1 :
+                return True
 
-        return False
+            return False
 
     @helper_function.log_error()
     def FlashOnOnce(self,data):
         #Pattern 1 = 22222221222222
         # The on can happen in any index
         on = 1
-        
-        if data.count(on) == 1 :
-            return True
+        if data and len(data) > 0 :
+            if data.count(on) == 1 :
+                return True
 
-        return False
+            return False
 
-PV = PatternVariant()
+# PV = PatternVariant()
+# PV = frequency_pattern_interval.PatternVariantInterval()

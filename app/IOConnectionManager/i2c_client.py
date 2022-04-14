@@ -6,6 +6,7 @@ import time,sys,os
 # sys.path.append(os.getcwd())
 import datetime
 from termcolor import colored
+from app.EventManager.frequency_pattern_interval import PatternVariantInterval
 from app.IOConnectionManager.i2c_singleton import I2CConfiguration
 from app.IOConnectionManager import mock_i2c as MockI2C
 from app.IOConnectionManager.i2c_v1 import i2c_connection
@@ -43,7 +44,7 @@ def _connect_i2c(stateServices : StateServices):
 
 @helper_function.log_error()
 def i2cModule():
-    frequencyManager = FrequencyManager()
+    frequencyManager = FrequencyManager(PatternVariantInterval())
     stateServices = StateServices()
 
     # if I2CCONT.BOL_MOCK_IO is True :
@@ -64,7 +65,7 @@ def i2cModule():
         for _message in message :
             print(colored(f'{datetime.datetime.now()} i2c combined Incoming','cyan'),f"{_message} , len={len(_message)}")
 
-            if len(_message['data']) == MQTTCON.SESSION_LIMIT_COUNT :
+            if len(_message['data']) == MQTTCON.LIMIT_FREQUENCY :
 
                 # e.g _message = {
                 #                   "data" : [(2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1), (2, 2, 1)] ,
@@ -75,7 +76,7 @@ def i2cModule():
                 # e.g unzipped_list = [(2, 2, 2, 2, 2, 2, 2, 2, 2, 2), (2, 2, 2, 2, 2, 2, 2, 2, 2, 2), (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)]                
                 unzipped_object = zip(*_message['data'])
                 unzipped_list = list(unzipped_object)  
-                print(unzipped_list)
+                # print(unzipped_list,'unzipped_list')
                 
                 # Transfrom and Normalize i2c data to event , broadcast to server
                 frequencyManager.addIncomingData(unzipped_list)
@@ -87,14 +88,14 @@ def i2cModule():
                 # 1. detect changes on broadcast (Default is None )
                 # 2. send to server (active)
                 # 3. interval push update to server (passive)
-                bolChange = stateServices.detectChanges(result)
+                stateServices.detectChanges(result,unzipped_list)
 
 
             else :
                 print(colored('I2C Incoming Message','red'),f"Invalid message length compared to MQTTCON.FREQUENCY {MQTTCON.FREQUENCY}")
                 
 
-        time.sleep(2)
+        time.sleep(0.1)
         # print(f"{datetime.datetime.now()} Thread i2cHandler")
 
 
