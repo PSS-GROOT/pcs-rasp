@@ -6,10 +6,11 @@ import time
 from datetime import datetime
 from json import JSONEncoder
 from app import load_config
-from app.EventManager.state_services import EventState
+
 
 
 # module
+from app.EventManager.state_services import EventState
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration, SettingRequest 
 from app.enum_type import ClientPublishTopic, PublishTopic
 from app.Utilities.helper_function import DateTimeEncoder
@@ -18,6 +19,7 @@ from app.IOMQTT.mqtt_interface import MqttClientInterface
 
 
 MQTTCON = MQTTConfiguration().instance
+
 
 class MqttServices(MqttClientInterface):
     def __init__(self,desc:str) -> None:
@@ -52,8 +54,10 @@ class MqttServices(MqttClientInterface):
         #Returns None
 
         #Parameters:
-            eventState(obj) : The light event for each address. 
-                                 e.g = [1,1,0] The element order is follow according to the address of raspberryPI IO.
+            eventState(obj) : The EventState object with 3 variables
+                                 e.g =  EventLightArray 
+                                        EventLightDetailed
+                                        EventSignalData 
             
             updateType(str) : The update type either Passive or Active.
                                 e.g Passive indicate the IO trigger changes where Active refer to the fix interval update.
@@ -197,20 +201,21 @@ class MqttServices(MqttClientInterface):
 
                 if len(message) != 3 :
                     continue
-
+                
+                # For error , eventState variable might is string.
                 eventState,route,updateType = message
-                eventState : Union[EventState, str]
+                # eventState : Union[EventState, str]
 
-                print(eventState,route,updateType,'eventState,route,updateType')
+                # print(eventState,route,updateType,'eventState,route,updateType')
 
                 if route == ClientPublishTopic.ReplyEvent.value :
-                    # self.reply_event_changed(event_status= eventState.EventLightArray,updateType= updateType , event_detail=eventState.EventLightDetailed)
-
                     self.reply_event_changed(eventState,updateType= updateType)
                 elif route == ClientPublishTopic.ReplyErrorLog.value :
                     self.reply_error(eventState)
                 elif route == ClientPublishTopic.ReplyService.value :
                     pass
+                elif route == ClientPublishTopic.ReplySignalRealTime.value :
+                    self.reply_hmi(eventState)
                 
             
 
@@ -219,6 +224,22 @@ class MqttServices(MqttClientInterface):
 
         except Exception as e :
             print(colored('MQTT receive_incoming_message()','red'),f"{e.args}")
+
+    def reply_hmi(self,data):
+        ''' 
+        #Return "EventLightDetailed": {
+                 "Red": 2 , 
+                 "Amber" : 2, 
+                 "Green": 1,
+                 }
+
+        '''
+        try :
+            
+            payload = json.dumps(data,indent=4,cls=DateTimeEncoder)
+            mqtt_client.publish_topic(payload,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplySignalRealTime.value,0,False)
+        except Exception as e :
+            print(colored('MQTT reply_hmi()','red'),f"{e.args}")
 
 def _receive_incoming_message()-> list:
     ''' 

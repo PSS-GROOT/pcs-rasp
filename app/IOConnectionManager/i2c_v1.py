@@ -3,7 +3,7 @@ import time ,datetime
 import os
 from app.IOConnectionManager.i2c_singleton import I2CConfiguration
 from app.IOConnectionManager.mock_i2c import mockData
-from app.IOMQTT.mqtt_singleton import MQTTConfiguration
+from app.IOMQTT.mqtt_singleton import MQTTConfiguration  
 from app.Utilities.helper_function import getTowerColorGroup
 from app.enum_type import LightEvent
 from termcolor import colored
@@ -106,6 +106,8 @@ def readi2c():
                             output = towerToData.towerType(MQTTCON.TOWER_TYPE,int(data))
                             # print(f"Output towerToData.towerType() {output}")
 
+                            I2CCON.REAL_TIME_SIGNAL = output
+
                             data_list = tuple(output)
                             sessionData.append(data_list)
                         
@@ -124,34 +126,34 @@ def readi2c():
             print(msg)
 
 
-def initialize_i2c():
+# def initialize_i2c():
   
 
-    # Calculate the 2's complement of a number
-    def twos_comp(val, bits):
-        if (val & (1 << (bits - 1))) != 0:
-            val = val - (1 << bits)
-        return val
-    # Initialize I2C (SMBus)
-    bus = SMBus(i2c_ch)
+#     # Calculate the 2's complement of a number
+#     def twos_comp(val, bits):
+#         if (val & (1 << (bits - 1))) != 0:
+#             val = val - (1 << bits)
+#         return val
+#     # Initialize I2C (SMBus)
+#     bus = SMBus(i2c_ch)
 
-    # Read the CONFIG register (2 bytes)
-    val = bus.read_i2c_block_data(i2c_address, reg_config, 2)
-    print("Old CONFIG:", val)
+#     # Read the CONFIG register (2 bytes)
+#     val = bus.read_i2c_block_data(i2c_address, reg_config, 2)
+#     print("Old CONFIG:", val)
 
-    # Set to 4 Hz sampling (CR1, CR0 = 0b10)
-    val[1] = val[1] & 0b00111111
-    val[1] = val[1] | (0b10 << 6)
+#     # Set to 4 Hz sampling (CR1, CR0 = 0b10)
+#     val[1] = val[1] & 0b00111111
+#     val[1] = val[1] | (0b10 << 6)
 
-    # Write 4 Hz sampling back to CONFIG
-    bus.write_i2c_block_data(i2c_address, reg_config, val)
+#     # Write 4 Hz sampling back to CONFIG
+#     bus.write_i2c_block_data(i2c_address, reg_config, val)
 
-    # Read CONFIG to verify that we changed it
-    val = bus.read_i2c_block_data(i2c_address, reg_config, 2)
-    print("New CONFIG:", val)
+#     # Read CONFIG to verify that we changed it
+#     val = bus.read_i2c_block_data(i2c_address, reg_config, 2)
+#     print("New CONFIG:", val)
 
-    # Print out temperature every second
-    while True:
-        temperature = read_temp()
-        print(round(temperature, 2), "C")
-        time.sleep(1)
+#     # Print out temperature every second
+#     while True:
+#         temperature = read_temp()
+#         print(round(temperature, 2), "C")
+#         time.sleep(1)

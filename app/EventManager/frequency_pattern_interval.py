@@ -1,8 +1,7 @@
 
-import enum
 from itertools import cycle
-from re import L
 from typing import List
+from app import load_config
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration
 from app.Utilities import helper_function
 from termcolor import colored
@@ -20,7 +19,7 @@ class PatternVariantInterval():
         return round(a * MQTTCON.FREQUENCY,2)
 
     def printConsole(self,data,fromTime,toTime,accumulateList,bolResult):
-        if MQTTCON.DEBUG :
+        if load_config.DEBUG is True :
             debugLog = dict(data = data ,
                 fromTime = fromTime ,
                 toTime =toTime,
@@ -31,13 +30,12 @@ class PatternVariantInterval():
             
             color = "green" if bolResult else "red"
             print(colored(f"{bolResult}",color),debugLog )
-            # print(debugLog)
-       
+
 
     @helper_function.log_error()
     def SolidOn(self,data):
-        fromTime = MQTTCON.SOLID_ON[0]
-        toTime = MQTTCON.SOLID_ON[1]
+        fromTime = MQTTCON.SOLID_ON[0] * MQTTCON.MULTIPLIER
+        toTime = MQTTCON.SOLID_ON[1] * MQTTCON.MULTIPLIER
         accumulateList = []
         accumulateCounter = 0
         bolResult = False
@@ -71,8 +69,8 @@ class PatternVariantInterval():
 
     @helper_function.log_error()
     def SolidOff(self,data):
-        fromTime = MQTTCON.SOLID_OFF[0]
-        toTime = MQTTCON.SOLID_OFF[1]
+        fromTime = MQTTCON.SOLID_OFF[0] * MQTTCON.MULTIPLIER
+        toTime = MQTTCON.SOLID_OFF[1] * MQTTCON.MULTIPLIER
         accumulateList = []
         accumulateCounter = 0
         bolResult = False
@@ -114,8 +112,8 @@ class PatternVariantInterval():
         if not data : 
             return False
     
-        fromTime = MQTTCON.FAST_FLASH[0]
-        toTime = MQTTCON.FAST_FLASH[1]
+        fromTime = MQTTCON.FAST_FLASH[0] * MQTTCON.MULTIPLIER
+        toTime = MQTTCON.FAST_FLASH[1] * MQTTCON.MULTIPLIER
         accumulateList = []
         accumulateCounter = 1
         bolResult = False
@@ -155,8 +153,8 @@ class PatternVariantInterval():
         if not data : 
             return False
     
-        fromTime = MQTTCON.SLOW_FLASH[0]
-        toTime = MQTTCON.SLOW_FLASH[1]
+        fromTime = MQTTCON.SLOW_FLASH[0] * MQTTCON.MULTIPLIER
+        toTime = MQTTCON.SLOW_FLASH[1] * MQTTCON.MULTIPLIER
         accumulateList = []
         accumulateCounter = 1
         bolResult = False
@@ -208,17 +206,23 @@ class PatternVariantInterval():
 
     @helper_function.log_error()
     def FlashOffOnce(self,data):
-        self.fromTime:float = MQTTCON.FLASH_OFF_ONCE[0]
-        self.toTime :float = MQTTCON.FLASH_OFF_ONCE[1]
-        self.PatternToCapture = cycle([LightEvent.SolidOn.value , LightEvent.SolidOff.value , LightEvent.SolidOff.value])
+        self.fromTime:float = MQTTCON.FLASH_OFF_ONCE[0] * MQTTCON.MULTIPLIER
+        self.toTime :float = MQTTCON.FLASH_OFF_ONCE[1] * MQTTCON.MULTIPLIER
+        self.PatternToCapture = cycle([LightEvent.SolidOn.value , LightEvent.SolidOff.value , LightEvent.SolidOn.value])
         return self.FlashOnceCommon(data)
         
     @helper_function.log_error()
     def FlashOnOnce(self,data):
-        self.fromTime:float = MQTTCON.FLASH_ON_ONCE[0]
-        self.toTime :float = MQTTCON.FLASH_ON_ONCE[1]
-        self.PatternToCapture = cycle([LightEvent.SolidOff.value , LightEvent.SolidOn.value , LightEvent.SolidOff.value])
-        return self.FlashOnceCommon(data)
+        self.fromTime:float = MQTTCON.FLASH_ON_ONCE[0] * MQTTCON.MULTIPLIER
+        self.toTime :float = MQTTCON.FLASH_ON_ONCE[1] * MQTTCON.MULTIPLIER
+        
+        pattern = [LightEvent.SolidOff.value , LightEvent.SolidOn.value , LightEvent.SolidOff.value]
+        self.PatternToCapture = cycle(pattern)
+        # print(pattern)
+        result = self.FlashOnceCommon(data)
+        # print(test,"Result")
+    
+        return result
 
     def FlashOnceCommon(self,data):
         ''' 
@@ -248,12 +252,14 @@ class PatternVariantInterval():
         patternToCapture : cycle[int] =  self.PatternToCapture
         patternToCaptureCurrentValue  :int = next(patternToCapture)
         currentIndexInPatternIterable : int = 0
-  
+    
         patternCapturedCounter: tuple[int,int] = ()
         patternCaptured : List[tuple[int,int]] = []
 
         previousPattern:int = None
         currentPattern:int = None # 1 or 2
+
+        print(colored('Pattern','green'),self.PatternToCapture)
 
 
         def IsLast(totalLength:int,current:int):
@@ -340,8 +346,7 @@ class PatternVariantInterval():
                             patternToCapture =  self.PatternToCapture
                             patternToCaptureCurrentValue= NextPattern()
                             # print("Reset pattern cycle")
-
-                        
+                  
                             patternCaptured.append(patternCapturedCounter)
                             patternCapturedCounter = ()
                             accumulateCounter = 0
@@ -355,10 +360,7 @@ class PatternVariantInterval():
                         if MQTTCON.DEBUG: print(f"Looping to Match first pattern.")
                         continue
 
-              
-                
-     
-
+                        
             # Check valid
             for x in patternCaptured :
                 print(x)
@@ -370,18 +372,24 @@ class PatternVariantInterval():
                 secondHalfResult = totalTime2 >= fromTime and totalTime2 <= toTime 
 
                 if secondHalfResult and firstHalfResult :
+                    print(colored(f"Matched time range {totalTime},{totalTime2}",'green'))
                     bolResult = True
+                else :
+                    print(f"Not Match time range {totalTime},{totalTime2}")
 
-
-        
         printData = dict(
             data = data ,
             patternCaptured = patternCaptured ,
-            bolResult = bolResult
+            bolResult = bolResult,
+            fromTime = fromTime ,
+            toTime =toTime,
+            # accumulateDuration = list(map(self.calDuration,patternCaptured)) ,
         )
-
+        
 
         if MQTTCON.DEBUG: print(colored(f'Pattern Interval Result ','cyan'),printData)  
+
+        return bolResult
         
 
 

@@ -126,7 +126,8 @@ def mqtt_broadcast(msg, topic,qos=0,retain=False):
     try :
         if client :
             client.publish(topic, msg, qos=qos, retain=retain)
-            print(colored('MQTT Outgoing','green'),f"{msg},\n to {topic}")
+            if ClientPublishTopic.ReplySignalRealTime.value not in topic :
+                print(colored('MQTT Outgoing','green'),f"{msg},\n to {topic}")
         else :
             print(colored('MQTT','green'),f"mqtt_broadcast() unable to broadcast due to client is None {client}.")
     except Exception as e :

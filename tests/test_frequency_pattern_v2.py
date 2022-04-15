@@ -20,49 +20,59 @@ class test_frequency_pattern_v2(unittest.TestCase):
         self.FM.addIncomingData(unzipped_list)
         self.result = self.FM.PatternProcessor(data['address'])
 
-    def test_solid_on(self):
-     
-        self.assertFalse(self.PV.SolidOn(None))
-        self.assertFalse(self.PV.SolidOn([1]))
-        self.assertFalse(self.PV.SolidOn([]))
-        self.assertFalse(self.PV.SolidOn([1, 1, 1, 1, 1, 2, 2, 2, 2]))
-        self.assertFalse(self.PV.SolidOn([1, 1, 1, 1, 2, 2, 2, 2]))
-        self.assertFalse(self.PV.SolidOn([1, 1, 2, 1, 2, 2, 2, 2]))
-        self.assertFalse(self.PV.SolidOn([1, 1, 2, 2, 1, 1, 2, 2]))
-        self.assertTrue(self.PV.SolidOn( [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 2, 2, 1, 1]))
+    # def test_solid_on(self):
+    #     print("test_solid_on")
+    #     self.assertFalse(self.PV.SolidOn(None))
+    #     self.assertFalse(self.PV.SolidOn([1]))
+    #     self.assertFalse(self.PV.SolidOn([]))
+    #     self.assertFalse(self.PV.SolidOn([1, 1, 1, 1, 1, 2, 2, 2, 2]))
+    #     self.assertFalse(self.PV.SolidOn([1, 1, 1, 1, 2, 2, 2, 2]))
+    #     self.assertFalse(self.PV.SolidOn([1, 1, 2, 1, 2, 2, 2, 2]))
+    #     self.assertFalse(self.PV.SolidOn([1, 1, 2, 2, 1, 1, 2, 2]))
+    #     self.assertTrue(self.PV.SolidOn( [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 2, 2, 1, 1]))
     
 
-    def test_solid_off(self):
-     
-        self.assertFalse(self.PV.SolidOff(None))
-        self.assertFalse(self.PV.SolidOff([1]))
-        self.assertFalse(self.PV.SolidOff([]))
-        self.assertFalse(self.PV.SolidOff([1, 1, 1, 1, 1, 2, 2, 2, 2]))
-        self.assertFalse(self.PV.SolidOff([1, 1, 1, 1, 2, 2, 2, 2]))
-        self.assertFalse(self.PV.SolidOff([1, 1, 2, 1, 2, 2, 2, 2]))
-        self.assertFalse(self.PV.SolidOff([1, 1, 2, 2, 1, 1, 2, 2]))
-        self.assertFalse(self.PV.SolidOff([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 2, 2, 1, 1]))
-        self.assertTrue(self.PV.SolidOff([2,2,2,2,2,2,2,2,2,2, 2, 1, 1, 1, 2, 2, 2, 1, 1,2,2,1]))
+    # def test_solid_off(self):
+    #     print("test_solid_off")
+    #     self.assertFalse(self.PV.SolidOff(None))
+    #     self.assertFalse(self.PV.SolidOff([1]))
+    #     self.assertFalse(self.PV.SolidOff([]))
+    #     self.assertFalse(self.PV.SolidOff([1, 1, 1, 1, 1, 2, 2, 2, 2]))
+    #     self.assertFalse(self.PV.SolidOff([1, 1, 1, 1, 2, 2, 2, 2]))
+    #     self.assertFalse(self.PV.SolidOff([1, 1, 2, 1, 2, 2, 2, 2]))
+    #     self.assertFalse(self.PV.SolidOff([1, 1, 2, 2, 1, 1, 2, 2]))
+    #     self.assertFalse(self.PV.SolidOff([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 2, 2, 1, 1]))
+    #     self.assertTrue(self.PV.SolidOff([2,2,2,2,2,2,2,2,2,2, 2, 1, 1, 1, 2, 2, 2, 1, 1,2,2,1]))
 
+
+
+    # def test_fast_flash(self):
+    #     print("test_fast_flash")
+    #     self.assertFalse(self.PV.FastFlashing(None))
+    #     self.assertFalse(self.PV.FastFlashing([1]))
+    #     self.assertFalse(self.PV.FastFlashing([]))
+    #     self.assertFalse(self.PV.FastFlashing([1, 1, 1, 1, 1, 2, 2, 2, 2]))
+    #     self.assertFalse(self.PV.FastFlashing([1,1,2,2,2,2,2,1,1]))
+    #     self.assertFalse(self.PV.FastFlashing([1,1,2,2,1,1,2,2,1,1]))
+    #     self.assertFalse(self.PV.FastFlashing([2,2,2,2,2,1,1,1,1]))
+
+    #     self.assertTrue(self.PV.FastFlashing([1,2,1,2]))
+    #     self.assertTrue(self.PV.FastFlashing([1,2,2,1]))
+    #     self.assertTrue(self.PV.FastFlashing([1,2,2,2,2,2]))
+    #     self.assertTrue(self.PV.FastFlashing([1,2,2,2,2,2,1]))
+
+    # def test_slow_flash(self):
+    #     print("slow flash")
+    #     # self.assertFalse(self.PV.SlowFlashing([2,2,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,1,1]))
+    #     self.assertTrue(self.PV.SlowFlashing([2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,2,2,2,2]))
+    #     # self.assertFalse(self.PV.SlowFlashing([1,1,1,2,2,2,1,1,1]))
     
-    def test_fast_flash(self):
-        self.assertFalse(self.PV.FastFlashing(None))
-        self.assertFalse(self.PV.FastFlashing([1]))
-        self.assertFalse(self.PV.FastFlashing([]))
-        self.assertFalse(self.PV.FastFlashing([1, 1, 1, 1, 1, 2, 2, 2, 2]))
-        self.assertFalse(self.PV.FastFlashing([1,1,2,2,2,2,2,1,1]))
-        self.assertFalse(self.PV.FastFlashing([1,1,2,2,1,1,2,2,1,1]))
-        self.assertFalse(self.PV.FastFlashing([2,2,2,2,2,1,1,1,1]))
+    def test_flash_on_once(self):
+        print("flash on once")
+        self.assertFalse(self.PV.FlashOnOnce([2,2,2,2,2,2,2,2,2,1,1,1,1,2,2,2]))
+        self.assertTrue(self.PV.FlashOnOnce([2,2,2,1,1,1,2,2,2]))
+        self.assertFalse(self.PV.FlashOnOnce([2,1,2,1,2]))
 
-        self.assertTrue(self.PV.FastFlashing([1,2,1,2]))
-        self.assertTrue(self.PV.FastFlashing([1,2,2,1]))
-        self.assertTrue(self.PV.FastFlashing([1,2,2,2,2,2]))
-        self.assertTrue(self.PV.FastFlashing([1,2,2,2,2,2,1]))
-
-    
-      
     def test_tower_type(self):
         test = towerType(5,255)
-        # print(test)
-
         self.assertEqual([2,2,2,2,2],test)

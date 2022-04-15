@@ -17,12 +17,15 @@ from typing import List
 
 from termcolor import colored
 from app.IOMQTT.mqtt_singleton import MQTTConfiguration
-from app.enum_type import EventChangeType, ServiceStatus
+from app.Utilities.helper_function import getTowerColorGroup
+from app.enum_type import ClientPublishTopic, EventChangeType, ServiceStatus
+from app.IOConnectionManager.i2c_singleton import I2CConfiguration
 
 MQTTCON = MQTTConfiguration().instance
+I2CCON = I2CConfiguration().instance
 
 class EventState:
-    def __init__(self, eventArray , eventDetailed, unzipped_list) -> None:
+    def __init__(self, eventArray : List[str] , eventDetailed:dict=None, unzipped_list=None) -> None:
         self.EventLightArray = eventArray
         self.EventLightDetailed = eventDetailed
         self.EventSignalData = self.joinList(unzipped_list)
@@ -35,16 +38,10 @@ class EventState:
                 "Red": { "type": "SolidOff", "code": 2 }, 
                 "Amber": {"type": "SolidOff", "code": 2}, 
                 "Green": {"type": "SolidOn", "code": 1}}
-            "EventSignalData" :{
-
-            }
+            "EventSignalData" :[222222222,222222222,11111111]
         } 
 
         '''
-        # data = {
-        #     'EventLightArray' : self.EventLightArray ,
-        #     'EventLightDetailed' : self.EventLightDetailed
-        # }
         return json.dumps(self.__dict__)
 
         
@@ -161,6 +158,23 @@ class StateServices():
     def serviceIOChangeAppendQueue(self):
         try :
             MQTTCON.SEND_MESSAGE_QUEUE.put([self.currentServiceState,'/client/service', None])
+        except Exception as e :
+            MQTTCON.addErrorMessage(e.args)
+
+    def serviceIOSignalRealTime(self):
+        try :
+            
+            intList : List[int]  = I2CCON.REAL_TIME_SIGNAL
+
+            if intList :
+                towerAddress = getTowerColorGroup(MQTTCON.TOWER_TYPE)
+                    
+                data=dict()
+
+                for x,y in zip(intList,towerAddress) :
+                    data[y] = x
+                
+                MQTTCON.SEND_MESSAGE_QUEUE.put([data,ClientPublishTopic.ReplySignalRealTime.value, None])
         except Exception as e :
             MQTTCON.addErrorMessage(e.args)
 

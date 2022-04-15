@@ -60,6 +60,9 @@ def i2cModule():
         # Interval push
         stateServices.intervalInform()
 
+        # Realtime update
+        stateServices.serviceIOSignalRealTime()
+
         message = _i2cMessageIncoming()
         
         for _message in message :

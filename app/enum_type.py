@@ -8,6 +8,7 @@ class PublishTopic(Enum):
     ReplyAck = "/server/ack"
 
 class ClientPublishTopic(Enum):
+    ReplySignalRealTime = "/client/realtime"    # Client feedback signal real time 
     RequestConfig = "/client/config"            # Client request config
     ReplyService = "/client/service"            # Client feedback service status    
     ReplyEvent = "/client/event"                # Client feedback event light status

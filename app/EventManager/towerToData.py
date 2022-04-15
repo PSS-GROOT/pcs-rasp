@@ -4,6 +4,10 @@ from app.enum_type import TowerType, TowerTypeColor
 
 
 def towerType(towerType:int , readValue :int):
+    ''' 
+    Return list of int 
+        e.g [1,1,1]
+    '''
     if towerType == TowerType.One.value :
         return type1valueToColor(readValue=readValue)
     elif towerType == TowerType.Two.value :

@@ -16,8 +16,11 @@ class I2CConfiguration:
             self.BOL_MOCK_IO = False
 
             # I2C STATE
-            self.STATE = None
-            self.ADDRESS_MAPPING = None
+            self.STATE = None               # NOT IN USE
+            self.ADDRESS_MAPPING = None     # NOT IN USE
+
+            # I2C REAL TIME SIGNAL
+            self.REAL_TIME_SIGNAL = None # [2,2,2,2,2]
 
     instance = None
     def __init__(self,arg=None) -> None:

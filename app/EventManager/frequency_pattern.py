@@ -47,24 +47,24 @@ class FrequencyManager():
         resultList = dict()
         for _data , _address in zip(self.IncomingData,address):
       
-            print(f"Accessing : {_data},{_address}")
+            # print(f"Accessing : {_data},{_address}")
             resultList[_address] = None
 
             for func in self.PatternVariants :
                 if func(_data) : 
                     lightEnum = LightEvent[func.__name__]
                     resultList[_address] =  dict(type=lightEnum._name_,code=lightEnum.value)
-                    print(colored(f"Rules MATCHED - {func.__name__}",'green'))
+                    # print(colored(f"Rules MATCHED {_address}: {func.__name__} data:{_data} ",'green'))
                     break
                 else :
-                    print(colored(f"Rules FAILED - {func.__name__}",'red'))
+                    # print(colored(f"Rules FAILED {_address}: {func.__name__} data:{_data}",'red'))
+                    pass
 
             # if no rules match
             if resultList[_address] == None :
                 resultList[_address] =  dict(type=LightEvent.Unknown._name_,code=LightEvent.Unknown.value)
-                print(colored(f"Rules Unknown MATCHED - {LightEvent.Unknown._name_}",'green'))
+                # print(colored(f"Rules Unknown MATCHED - {LightEvent.Unknown._name_}",'green'))
                
-
         return resultList   
 
 
