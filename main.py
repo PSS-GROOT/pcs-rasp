@@ -14,6 +14,20 @@ def backgroundTask(client_id):
     executor.submit(mqtt_client.init_client(type='client',name='pcs-rasp',client_id=client_id))
     executor.submit(mqtt_services.mqtt_consumer())
 
+def getserial():
+  # Extract serial from cpuinfo file
+  cpuserial = "0000000000000000"
+  try:
+    f = open('/proc/cpuinfo','r')
+    for line in f:
+      if line[0:6]=='Serial':
+        cpuserial = line[10:26]
+    f.close()
+  except:
+    cpuserial = "ERROR000000000"
+ 
+  return cpuserial
+
 
 if __name__ == "__main__" :
     try :
@@ -24,7 +38,8 @@ if __name__ == "__main__" :
 
         elif len(sys.argv) == 1 :
             # Invoke without argument , probably is production mode with real rasp.
-            client_id = hex(get_mac())
+            #client_id = hex(get_mac())
+            client_id = getserial()
 
         backgroundTask(client_id)
         i2c_client.i2cModule()
