@@ -47,12 +47,12 @@ def i2cModule():
     frequencyManager = FrequencyManager(PatternVariantInterval())
     stateServices = StateServices()
 
-    # if I2CCONT.BOL_MOCK_IO is True :
-    #     # Create mock IO thread
-    #     MockI2C.mock_tower_io_drivers(tower_type=TowerType.Three)
-    # else :
+    if I2CCONT.BOL_MOCK_IO is True :
+        # Create mock IO thread
+        MockI2C.mock_tower_io_drivers(tower_type=TowerType.Three)
+    else :
         # Real i2c connection and input
-    _connect_i2c(stateServices = stateServices)
+        _connect_i2c(stateServices = stateServices)
 
 
     while True :

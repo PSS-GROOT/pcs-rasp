@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import subprocess,os,sys,enum
 import platform
-instanceQty = 10
+instanceQty = 1
 
 class SCRIPT_TYPE(enum.Enum):
     PYTHON = 1

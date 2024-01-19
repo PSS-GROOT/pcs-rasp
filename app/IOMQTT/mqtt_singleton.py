@@ -14,8 +14,8 @@ class MQTTConfiguration:
             self.CLIENT_ID = None
             self.RECONNECT_INTERVAL = 15
             self.TOWER_TYPE = None
-            self.FREQUENCY = 0.1
-            self.LIMIT_FREQUENCY = 20
+            self.FREQUENCY = 0.1 # Thread sleep each 0.1 seconds for reading data from i/o
+            self.LIMIT_FREQUENCY = 20 # 20 message collected then will use to processsed and detect tower light pattern
             self.MULTIPLIER = self.LIMIT_FREQUENCY / 20
             self.INTERVAL_UPDATE = 30
             self.BOL_INTERVAL_UPDATE = True 

@@ -21,6 +21,18 @@ connected = False
 MQTTCON = MQTTConfiguration().instance
 
 
+
+status_code = {
+0   :"Connection accepted" ,
+1   :"Connection refused, unacceptable protocol version",
+2	:"Connection refused, identifier rejected",
+3	:"Connection refused, server unavailable",
+4	:"Connection refused, bad user name or password",
+5	:"Connection refused, not authorized",
+}
+
+
+
 def init_client(type:str, name:str, client_id=None):
     MQTTCON.MAC_CLIENT_ID = client_id
 
@@ -51,13 +63,15 @@ def connect_client(client_id = None,instance_type='server'):
                 client.on_message = on_message
                 client.on_disconnect = on_disconnect
             
-            def connectBroker():
+            def connectBroker()-> int:
                 try :
-                # The default keep alive period for the Python MQTT client is 60 secs, but it can be set to anything you want when you establish the client connection.
+                    # The default keep alive period for the Python MQTT client is 60 secs, but it can be set to anything you want when you establish the client connection.
                     result = client.connect(host=load_config.MQTT_HOST,port=1883, keepalive=300)
-                    return result
+                    print(colored('MQTT','green'),f"Mosquitto Broker connected. {status_code.get(result)}")
+                    return True
+
                 except Exception as e :
-                    print(colored('MQTT','red'),f"Require reconnect to mqtt broker.{e.args}")
+                    print(colored('MQTT','red'),f"Mosquitto on host server is not running, please verify the host machine IP {load_config.MQTT_HOST}:1883, Exception:{e.args}")
                     return None
                
 
@@ -71,7 +85,7 @@ def connect_client(client_id = None,instance_type='server'):
                     # print(client)
                     result = connectBroker()
                     # print(result)
-                    if result == 0 :
+                    if result :
                         connected = True
                         # The loop_start() starts a new thread, that calls the loop method at regular intervals for you. It also handles re-connects automatically.
                         # To stop the loop use the loop_stop() method. 
@@ -82,7 +96,7 @@ def connect_client(client_id = None,instance_type='server'):
                         msg = "MQTT Client loop_start()"
                         print(colored('MQTT','green'),msg)
                     else :
-                        print(colored('MQTT','red'),"Require reconnect to mqtt broker.")
+                        print(colored('MQTT','red'),"Require reconnect to mqtt broker, please ensure Mosquitto broker is running at host machine.")
                         time.sleep(MQTTCON.RECONNECT_INTERVAL)
                 else :
                     time.sleep(1)

@@ -22,7 +22,7 @@ class MqttClientInterface(metaclass=ABCMeta):
     def reply_ack(self):raise NotImplementedError
 
     @abstractmethod
-    def resend_message(self): raise NotImplementedError
+    def retry_request_configuration(self): raise NotImplementedError
 
     @abstractmethod
     def update_configuration(self): raise NotImplementedError

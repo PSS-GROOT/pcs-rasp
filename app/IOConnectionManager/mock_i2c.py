@@ -20,7 +20,7 @@ def mock_tower_io_drivers(tower_type : TowerType):
 
 def _mock(tower_type):
     mockUseCase = 'RUNNING' # 'ALERT' , 'WARNING'
-    intFrequencyInterval : int = 1
+    intFrequencyInterval : int = 0.1
     temp_data = [] # IO addresss from minimun 1 io address to 1,2,3,4,5 io address 
     currentCount = 0
     timingEvent = [(50,'RUNNING'),(20,'ALERT'),(40,'WARNING')]
@@ -34,7 +34,7 @@ def _mock(tower_type):
         intFrequency = MQTTCON.FREQUENCY
 
         # Reset counter , proceed to collection for next session
-        if (currentCount > intFrequency) and (intFrequency != 0):
+        if (currentCount > MQTTCON.LIMIT_FREQUENCY) and (intFrequency != 0):
 
             print(colored('Curr Timing','green'),f"{mockUseCase} , {seconds}")
 

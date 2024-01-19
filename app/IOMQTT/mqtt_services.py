@@ -1,18 +1,18 @@
 import json , socket
 from threading import Thread
-from typing import List, Mapping, Union
+from typing import Dict, List, Mapping, Union
 from termcolor import colored
 import time
 from datetime import datetime
-from json import JSONEncoder
 from app import load_config
 
 
 
 # module
 from app.EventManager.state_services import EventState
-from app.IOMQTT.mqtt_singleton import MQTTConfiguration, SettingRequest 
-from app.enum_type import ClientPublishTopic, PublishTopic
+from app.IOMQTT.mqtt_singleton import MQTTConfiguration, SettingRequest
+from app.Utilities import sqlite 
+from app.enum_type import ClientPublishTopic, EventChangeType, PublishTopic
 from app.Utilities.helper_function import DateTimeEncoder
 from app.IOMQTT import mqtt_client
 from app.IOMQTT.mqtt_interface import MqttClientInterface
@@ -43,6 +43,7 @@ class MqttServices(MqttClientInterface):
                 payload=  {"mac_client_id" : mac_client_id , 'client_id' : None , "dt" : datetime.now()}
                 payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
 
+            # mqtt_client.publish_topic("hello",mac_client_id,ClientPublishTopic.ReplyEvent.value,2,True)
             mqtt_client.publish_topic(payload,mac_client_id,ClientPublishTopic.RequestConfig.value)
 
             self.settingRequest.lastAttempt = datetime.now()
@@ -69,7 +70,7 @@ class MqttServices(MqttClientInterface):
         '''
 
         try :
-            
+            dtNow = datetime.now()
             payload = dict(
                 light_event = eventState.EventLightArray ,
                 detail = eventState.EventLightDetailed ,
@@ -81,16 +82,22 @@ class MqttServices(MqttClientInterface):
                 LIMIT_FREQUENCY = MQTTCON.LIMIT_FREQUENCY ,
                 tower_type = MQTTCON.TOWER_TYPE ,
                 range = MQTTCON.rangeData() ,
-                dt = datetime.now()
+                dt = dtNow
                 ),
                       
-            payload = json.dumps(payload,indent=4,cls=DateTimeEncoder)
-            mqtt_client.publish_topic(payload,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplyEvent.value,2,True)
+            payload_str = json.dumps(payload,indent=4,cls=DateTimeEncoder)
 
-            sampleMqttSubscription = f'mosquitto_sub -h {load_config.MQTT_HOST} -t {MQTTCON.MAC_CLIENT_ID}/client/event'
-            print(colored(f'{datetime.now()} MQTT subscribe','green'),f"{sampleMqttSubscription}")
+            if mqtt_client.connected :
+                mqtt_client.publish_topic(payload_str,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplyEvent.value,2,True)
+                sampleMqttSubscription = f'mosquitto_sub -h {load_config.MQTT_HOST} -t {MQTTCON.MAC_CLIENT_ID}/client/event'
+                print(colored(f'{datetime.now()} MQTT topic:','green'),f"{sampleMqttSubscription}")
+                return
+                
         except Exception as e :
             print(colored('MQTT reply_event_changed()','red'),f"{e.args}")
+        finally:
+            self.add_to_persist_queue(payload,payload_str,dtNow.isoformat())
+
 
     def reply_services(self,server_status:str):
         ''' 
@@ -156,8 +163,19 @@ class MqttServices(MqttClientInterface):
         except Exception as e :
             print(colored('MQTT reply_pong()','red'),f"{e.args}")
 
+    @classmethod
+    def retry_persist_data(cls,payload:str):
+        try :
+            mqtt_client.publish_topic(payload,MQTTCON.MAC_CLIENT_ID,ClientPublishTopic.ReplyEvent.value,2,True)
+        except Exception as e :
+            print(colored('MQTT retry_persist_data()','red'),f"{e.args}")
 
-    def resend_message(self):
+    def add_to_persist_queue(self,payload:Dict,payload_str:str,dtNow:str):
+        if payload[0].get("update_type") == EventChangeType.Passive.value :   
+            sqlite.RaspSqlite.append(payload_str,dtNow)
+
+
+    def retry_request_configuration(self):
         # Resend Request Configuration
         try :
             if self.settingRequest.bolRequest is False :
@@ -188,6 +206,8 @@ class MqttServices(MqttClientInterface):
                 print(colored('MQTT Update Config','blue'),f"Update attribute {capitalKey} value to {value}")
 
             self.settingRequest.bolRequest = True
+            data = json.dumps(payload)
+            sqlite.RaspSqlite.add_config(data)
             print(colored('MQTT Request','blue'),f"Configuration acquired, rasp will stop request setting.")
         except Exception as e :
             print(colored('MQTT update_configration()','red'),f"{e.args}")
@@ -276,7 +296,7 @@ def mqtt_consumer():
         while True :
             try :
                 mServices.send_message()
-                mServices.resend_message()
+                mServices.retry_request_configuration()
                 
                 if MQTTCON.BOL_IS_RECEIVED :
                     messsage_queue = _receive_incoming_message()
@@ -314,7 +334,7 @@ def mqtt_consumer():
                 time.sleep(0.5)
 
             except Exception as e :
-                msg = f"mqtt_consumer() While loop {e.arq}"
+                msg = f"mqtt_consumer() While loop {e.args}"
                 print(colored('MQTT mqtt_consumer()','red'),msg)
                 MQTTCON.addErrorMessage(msg)
     

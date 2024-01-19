@@ -1,18 +1,18 @@
-import test
 from app.IOConnectionManager import i2c_client
 from app.IOMQTT import mqtt_client , mqtt_services
 from concurrent.futures import ThreadPoolExecutor
-import threading
 from uuid import getnode as get_mac
 import sys
+from app.Utilities import sqlite
 
-executor = ThreadPoolExecutor(2)
+executor = ThreadPoolExecutor(3)
 
 
 
 def backgroundTask(client_id):
     executor.submit(mqtt_client.init_client(type='client',name='pcs-rasp',client_id=client_id))
     executor.submit(mqtt_services.mqtt_consumer())
+    executor.submit(sqlite.create_thread())
 
 def getserial():
   # Extract serial from cpuinfo file
@@ -41,7 +41,7 @@ if __name__ == "__main__" :
             #client_id = hex(get_mac())
             client_id = getserial()
 
-        backgroundTask(client_id)
+        backgroundTask(client_id)  
         i2c_client.i2cModule()
 
     except Exception as e :
