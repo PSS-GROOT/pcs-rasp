@@ -114,6 +114,7 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
     
 
 7. To run simulation in batch
+    > Configure BOL_MOCK_IO to True at i2c_singleton.py
     > python configureMock.py
 
 
@@ -124,4 +125,16 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
 
 9. To see all the connected devices
     > sudo i2cdetect -y 1
+
+
+10. Publisher
+    MacOS
+    1. Run mqtt with terminal
+    > /opt/homebrew/opt/mosquitto/sbin/mosquitto -c /opt/homebrew/etc/mosquitto/mosquitto.conf -v
+
+    2. Publish event msg
+    > mosquitto_pub -h localhost -t "1/client/event" -m "{\"user\":"nickson"}"
     
+    3. Publish config msg
+    > mosquitto_pub -h localhost -t "1/server/config" -m "{\"frequency\": 10, \"client_id\": 75, \"tower_type\": 3, \"reconnect_interval\": 15, \"interval_update\": 30 , \"retention_day\": 7 , \"retention_gb\" : 5  }"
+
