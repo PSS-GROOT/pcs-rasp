@@ -1,10 +1,8 @@
+# This is global , apply for all user , not working for model 4B , this work for model 3B
 sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
-
 @sleep 10 && /home/pi/Desktop/PCS/PCS
 
-
-
-
+# This is user level, working for model 4B
 Create a .desktop File
 mkdir /home/pi/.config/autostart
 nano /home/pi/.config/autostart/electron.desktop
