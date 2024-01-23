@@ -76,8 +76,18 @@ def connect_client(client_id = None,instance_type='server'):
                     print(colored('MQTT','red'),f"Mosquitto on host server is not running, please verify the host machine IP {load_config.MQTT_HOST}:1883, Exception:{e.args}")
                     return None
                
+            def connectBrokerTest()-> int:
+                try :
+                    # The default keep alive period for the Python MQTT client is 60 secs, but it can be set to anything you want when you establish the client connection.
+                    result = test_client.connect(host=load_config.MQTT_HOST,port=1883, keepalive=300)
+                    print(colored('MQTT','green'),f"Mosquitto Broker connected. {status_code.get(result)}")
+                    return True
 
-            global client , connected
+                except Exception as e :
+                    print(colored('MQTT','red'),f"Mosquitto on host server is not running, please verify the host machine IP {load_config.MQTT_HOST}:1883, Exception:{e.args}")
+                    return None
+
+            global client , test_client, connected
             connected = False
             while True :
 
@@ -102,14 +112,14 @@ def connect_client(client_id = None,instance_type='server'):
                         time.sleep(MQTTCON.RECONNECT_INTERVAL)
                 else :
                     ## mock another client to connect to mqtt
-                    check_wifi_client = mqtt.Client(f"CHECK_WIFI_CLIENT{client_id}")
-                    result = connectBroker()
+                    test_client = mqtt.Client(f"CHECK_WIFI_CLIENT{client_id}")
+                    result = connectBrokerTest()
                     if result == None :
                         print(colored('MQTT','red'),f"Detected connection loss")
                         connected = False
                         client.disconnect()
                     else :
-                        check_wifi_client.disconnect()
+                        test_client.disconnect()
                         
 
                     time.sleep(1)
