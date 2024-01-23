@@ -1,0 +1,21 @@
+[Unit]
+Description=Start Electron
+
+[Service]
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+ExecStart=/home/pi/Desktop/PCS/PCS
+Restart=always
+RestartSec=10s
+KillMode=process
+TimeoutSec=infinity
+
+[Install]
+WantedBy=graphical.target
+
+#usage
+#sudo nano /etc/systemd/system/pcs-electron.service
+#sudo systemctl daemon-reload
+#sudo systemctl start your-service-name
+#sudo systemctl enable your-service-name
+
