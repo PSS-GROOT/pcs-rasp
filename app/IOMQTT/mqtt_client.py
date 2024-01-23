@@ -107,6 +107,7 @@ def connect_client(client_id = None,instance_type='server'):
                     if result == None :
                         print(colored('MQTT','red'),f"Detected connection loss")
                         connected = False
+                        client.disconnect()
                     else :
                         check_wifi_client.disconnect()
                         
