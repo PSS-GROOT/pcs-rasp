@@ -138,3 +138,6 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
     3. Publish config msg
     > mosquitto_pub -h localhost -t "1/server/config" -m "{\"frequency\": 10, \"client_id\": 75, \"tower_type\": 3, \"reconnect_interval\": 15, \"interval_update\": 30 , \"retention_day\": 7 , \"retention_gb\" : 5  }"
 
+
+11. Auto Start
+    > Refer raspStart.sh and autoStart.sh
