@@ -42,6 +42,8 @@ def init_client(type:str, name:str, client_id=None):
     loop_start.start()
 
 
+
+
 def connect_client(client_id = None,instance_type='server'):
     """ Create mqtt client constructor , connect to mqtt broker, invoke selection either server or rasp """  
     try :
@@ -99,6 +101,16 @@ def connect_client(client_id = None,instance_type='server'):
                         print(colored('MQTT','red'),"Require reconnect to mqtt broker, please ensure Mosquitto broker is running at host machine.")
                         time.sleep(MQTTCON.RECONNECT_INTERVAL)
                 else :
+                    ## mock another client to connect to mqtt
+                    check_wifi_client = mqtt.Client(f"CHECK_WIFI_CLIENT{client_id}")
+                    result = connectBroker()
+                    if result == None :
+                        print(colored('MQTT','red'),f"Detected connection loss")
+                        connected = False
+                    else :
+                        check_wifi_client.disconnect()
+                        
+
                     time.sleep(1)
                                      
     except Exception as e :
