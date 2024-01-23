@@ -1,0 +1,20 @@
+sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
+
+@sleep 10 && /home/pi/Desktop/PCS/PCS
+
+
+
+
+Create a .desktop File
+mkdir /home/pi/.config/autostart
+nano /home/pi/.config/autostart/electron.desktop
+
+
+content in electron.desktop
+[Desktop Entry]
+Type=Application
+Name=Electron
+Exec=/home/pi/Desktop/PCS/PCS
+
+
+https://learn.sparkfun.com/tutorials/how-to-run-a-raspberry-pi-program-on-startup/method-2-autostart#:~:text=After%20your%20desktop%20environment%20starts,autostart%20for%20our%20Raspberry%20Pi.
