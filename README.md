@@ -141,3 +141,13 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
 
 11. Auto Start
     > Refer raspStart.sh and autoStart.sh
+    > Common problem
+    1. Autostart script execute before raspbian GUI initialize
+    2. Autostart script point to wrong path
+    3. Electron script no execution permission, permission denied 
+    4. Electron script owner belong to root user and not pi user, permission denied.
+
+
+12. Way tested
+    > rc.local does not give you access to the X server (the thing that gives you a GUI desktop). So, rc.local for a GUI program is not the right tool
+    
