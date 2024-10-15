@@ -98,7 +98,6 @@ class MqttServices(MqttClientInterface):
         finally:
             self.add_to_persist_queue(payload,payload_str,dtNow.isoformat())
 
-
     def reply_services(self,server_status:str):
         ''' 
         #Returns None

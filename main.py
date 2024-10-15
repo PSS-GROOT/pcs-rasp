@@ -34,7 +34,7 @@ if __name__ == "__main__" :
         if len(sys.argv) == 2:
             # Invoke with argument , probably is simulation.
             client_id = sys.argv[1]
-            print(client_id)
+            print(f"invole with argument 1 {client_id}")
 
         elif len(sys.argv) == 1 :
             # Invoke without argument , probably is production mode with real rasp.

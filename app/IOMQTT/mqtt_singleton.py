@@ -1,11 +1,25 @@
 
 from datetime import datetime
 from queue import Queue
+from typing import Dict, List
 from app import load_config
 
 from app.enum_type import ClientPublishTopic, TowerType
 
+"""
+FREQUENCY default 0.1s
+LIMIT_FREQUENCY default 20
+MULTIPLIER = LIMIT_FREQUENCY / 20
 
+e.g Every 2 seconds , raspberry collect signal from tower light with interval of 0.1 seconds
+- There would be 20 data for 2 seconds for pattern processing.
+
+For FAST_FLASH range configuration = [0.08, 0.12] indicate between the 20 data, if each data on and off at 0.1s and its still between range of 0.08s to 0.12. 
+It will identified as FAST_FLASH.
+
+USAGE of FREQUENCY and LIMIT_FREQUENCY
+When client tower light FAST_FLASH is between [0.16, 0.24] seconds.
+ """
 class MQTTConfiguration:
     class __OnlyOne:
         def __init__(self) -> None:
@@ -16,7 +30,7 @@ class MQTTConfiguration:
             self.TOWER_TYPE = None
             self.FREQUENCY = 0.1 # Thread sleep each 0.1 seconds for reading data from i/o
             self.LIMIT_FREQUENCY = 20 # 20 message collected then will use to processsed and detect tower light pattern
-            self.MULTIPLIER = self.LIMIT_FREQUENCY / 20
+            self.MULTIPLIER = self.LIMIT_FREQUENCY / 20 # Use will by PatternVariantInterval class to up multiply the interval 
             self.INTERVAL_UPDATE = 30
             self.BOL_INTERVAL_UPDATE = True 
             self.DEBUG = load_config.DEBUG
@@ -58,9 +72,11 @@ class MQTTConfiguration:
                 'FLASH_OFF_ONCE' : self.FLASH_OFF_ONCE 
             }
             return data
+        
+        def updatePatternRange(self, pattern:Dict[str,List[float]]):
+            for k,v in pattern.items():
+                setattr(self,k,v)
 
-
-      
     instance = None
     def __init__(self,arg=None) -> None:
         if not MQTTConfiguration.instance :

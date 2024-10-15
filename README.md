@@ -151,3 +151,5 @@ Backend services that targeted install on raspberry-pi. Collect data from i2c IO
 12. Way tested
     > rc.local does not give you access to the X server (the thing that gives you a GUI desktop). So, rc.local for a GUI program is not the right tool
     
+
+13. python main.py abcd

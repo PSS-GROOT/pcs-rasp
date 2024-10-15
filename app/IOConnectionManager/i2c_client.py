@@ -95,7 +95,7 @@ def i2cModule():
 
 
             else :
-                print(colored('I2C Incoming Message','red'),f"Invalid message length compared to MQTTCON.FREQUENCY {MQTTCON.FREQUENCY}")
+                print(colored('I2C Incoming Message','red'),f"Invalid message length {len(_message['data'])} compared to MQTTCON.LIMIT_FREQUENCY {MQTTCON.LIMIT_FREQUENCY}")
                 
 
         time.sleep(0.1)

@@ -119,7 +119,7 @@ class RaspSqlite:
                     config_obj = json.loads(config)
                     cls.persist_days = config_obj.get("retention_day",7)
                     cls.persist_max_gb = config_obj.get("retention_gb",5)
-                    print(config)
+                    print(f"Retrieve config from {config}")
 
         except Exception as e :
             print(f"sqlite.py retrieve_config() Exception {e.args}")

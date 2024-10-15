@@ -40,7 +40,7 @@ def _mock(tower_type):
 
             # Add to queue only if not empty list
             if temp_data != [] :
-                data = dict(data = temp_data ,address = ('port1','port2','port3') )
+                data = dict(data = temp_data ,address = ('Red','Amber','Green') )
                 I2CCON.MESSAGE_QUEUE.put(data)
                 print("put data in queue", data)
                 temp_data = []

@@ -58,8 +58,12 @@ def readi2c():
     Address 0x01 = 248 All On
     Address 0x01 = 255 all Off
     '''
-    if DEV == False :
-        bus1 = SMBus(1)
+    try :
+        if DEV == False :
+            bus1 = SMBus(1)
+    except Exception as e :
+        print(f"Exception: {e.args}")
+        
     time.sleep(2)
     bytesList = bytes([0x01])
     # bytesList = bytes([0x00, 0x01, 0x02, 0x03, 0x04, 0x05,0x06, 0x07, 0x08, 0x09, 0x10, 0x11,

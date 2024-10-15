@@ -9,7 +9,6 @@ if env == 'DEVELOPMENT':
 
 elif env == 'PRODUCTION' : 
     MQTT_HOST = os.environ.get("PROD_MQTT_HOST")
-    print(MQTT_HOST)
 
 elif env == "TEST" :
     pass
